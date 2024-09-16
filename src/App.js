@@ -1,25 +1,34 @@
-import logo from './logo.svg';
 import './App.css';
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import ProfileSetup from './components/ProfileSetup';
+import ParentDashboard from './components/ParentDashboard';
+import ChildDashboard from './components/ChildDashboard';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const [darkMode, setDarkMode] = useState(false); // Track dark mode
+
+    // Toggle dark mode
+    const toggleDarkMode = () => {
+        setDarkMode(!darkMode);
+        document.body.classList.toggle('dark-mode', !darkMode); // Add/remove dark mode class
+    };
+
+    return (
+        <Router>
+            <div className="App">
+                <button onClick={toggleDarkMode}>
+                    {darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+                </button>
+                
+                <Routes>
+                    <Route path="/" element={<ProfileSetup />} />
+                    <Route path="/parent-dashboard" element={<ParentDashboard />} />
+                    <Route path="/child-dashboard" element={<ChildDashboard />} />
+                </Routes>
+            </div>
+        </Router>
+    );
 }
 
 export default App;
