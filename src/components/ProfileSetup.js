@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import ParentDashboard from './ParentDashboard';
 import ChildDashboard from './ChildDashboard';
+import "../components/styles/signup.css";
 
 function ProfileSetup() {
     const [role, setRole] = useState('');
