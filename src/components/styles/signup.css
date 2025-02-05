@@ -1,0 +1,30 @@
+/* Apply ombre background */
+html, body {
+    height: 100%;
+    margin: 0;
+    background: linear-gradient(to top,#0099CC,#91daff); /* Darker at bottom */
+    color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    position: relative;
+}
+
+
+/* Logo positioning */
+.logo {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+}
+
+/* Text styling */
+h1 {
+    z-index: 2;
+    position: relative;
+}
+
