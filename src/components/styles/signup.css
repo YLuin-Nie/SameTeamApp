@@ -1,30 +1,21 @@
-/* Apply ombre background */
 html, body {
-    height: 100%;
+    height: 100vh; /* Ensures the body takes exactly the viewport height */
+    width: 100vw; /* Ensures full viewport width */
     margin: 0;
-    background: linear-gradient(to top,#0099CC,#91daff); /* Darker at bottom */
+    overflow-x: hidden; /* Prevents horizontal scrolling */
+    overflow-y: auto; /* Allows vertical scrolling */
+    background: linear-gradient(to bottom, #c8e9f8, #81D4FA, #4FC3F7, #29B6F6, #039BE5, #0277BD);
     color: black;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start; /* Ensures content starts from the top */
     align-items: center;
-    text-align: center;
+    flex-direction: column;
     font-family: Arial, sans-serif;
     position: relative;
+    transition: background 0.3s ease;
 }
 
+body.dark-mode {
+    background: linear-gradient(to bottom, #8A4FAD, #693B93, #4A2763, #2E1A47, #1A0F30, #0A0515);
 
-/* Logo positioning */
-.logo {
-    position: absolute;
-    top: 10%;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 2;
 }
-
-/* Text styling */
-h1 {
-    z-index: 2;
-    position: relative;
-}
-
