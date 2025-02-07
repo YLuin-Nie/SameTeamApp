@@ -17,13 +17,21 @@ function App() {
     return (
         <Router>
             <div className="App">
-                <button onClick={toggleDarkMode}>
-                    {darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-                </button>
-                
+                <div className="toggle-container">
+                    <div className={`toggle ${darkMode ? 'night' : ''}`} onClick={toggleDarkMode}>
+                        <div className={`notch`}>
+                            <div className="crater"></div>
+                            <div className="crater"></div>
+                        </div>
+                        <div className={`shape sm`}></div>
+                        <div className={`shape md`}></div>
+                        <div className={`shape lg`}></div>
+                    </div>
+                </div>
+
                 <Routes>
-                    <Route path="/" element={<SignUp />} /> {/* Start with SignUp */}
-                    <Route path="/profile-setup" element={<ProfileSetup />} /> {/* Navigate here after SignUp */}
+                    <Route path="/" element={<SignUp />} />
+                    <Route path="/profile-setup" element={<ProfileSetup />} />
                     <Route path="/parent-dashboard" element={<ParentDashboard />} />
                     <Route path="/child-dashboard" element={<ChildDashboard />} />
                 </Routes>
