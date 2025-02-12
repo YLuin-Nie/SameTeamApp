@@ -1,69 +1,46 @@
-import React, { useState } from 'react';
+// File Name: ChildDashboard.js
+
+import React, { useState, useEffect } from 'react';
+import { getCurrentUser, getUsers } from "./utils/localStorageUtils";
 
 function ChildDashboard() {
-    const [chores, setChores] = useState([
-        { id: 1, text: 'Take out the trash', completed: false, points: 10 },
-        { id: 2, text: 'Clean the dishes', completed: true, points: 20 }
-    ]);
-    
-    const [totalPoints, setTotalPoints] = useState(30);
-    const [messages, setMessages] = useState([
-        { id: 1, text: 'Great job cleaning the dishes!' },
-        { id: 2, text: 'Don’t forget to take out the trash.' }
-    ]);
+    const [chores, setChores] = useState([]);
+    const currentUser = getCurrentUser();
 
-    // Custom levels would come from the parent dashboard; hardcoded for now
-    const customLevels = [
-        { name: 'Beginner', minPoints: 0, maxPoints: 99 },
-        { name: 'Intermediate', minPoints: 100, maxPoints: 199 },
-        { name: 'Master', minPoints: 200, maxPoints: Infinity }
-    ];
-
-    // Function to get the current level based on total points
-    const getLevel = (points) => {
-        const level = customLevels.find(lvl => points >= lvl.minPoints && points <= lvl.maxPoints);
-        return level ? level.name : 'Unknown';
-    };
-
-    // Mark chore as complete and update total points
-    const completeChore = (id) => {
-        setChores(chores.map(chore => chore.id === id && !chore.completed ? { ...chore, completed: true } : chore));
-        const completedChore = chores.find(chore => chore.id === id);
-        if (completedChore && !completedChore.completed) {
-            setTotalPoints(totalPoints + completedChore.points);
+    // ✅ Load assigned chores when component mounts
+    useEffect(() => {
+        const storedChores = JSON.parse(localStorage.getItem("chores")) || [];
+        if (currentUser) {
+            const userChores = storedChores.filter(chore => chore.assignedTo === currentUser.username);
+            setChores(userChores);
         }
+    }, [currentUser]);
+
+    // ✅ Function to toggle chore completion
+    const toggleComplete = (id) => {
+        const updatedChores = chores.map(chore =>
+            chore.id === id ? { ...chore, completed: !chore.completed } : chore
+        );
+        setChores(updatedChores);
+
+        // ✅ Persist updated chores to localStorage
+        localStorage.setItem("chores", JSON.stringify(updatedChores));
     };
 
     return (
         <div>
             <h2>Child Dashboard</h2>
-            <div>
-                <h3>Total Points: {totalPoints}</h3>
-                <h3>Level: {getLevel(totalPoints)}</h3> {/* Display the current level */}
-            </div>
-
-            <div>
-                <h3>Your Chores</h3>
-                <ul>
-                    {chores.map((chore) => (
-                        <li key={chore.id}>
-                            {chore.text} - {chore.completed ? "Completed" : "Incomplete"} 
-                            {!chore.completed && (
-                                <button onClick={() => completeChore(chore.id)}>Mark as Complete</button>
-                            )}
-                        </li>
-                    ))}
-                </ul>
-            </div>
-
-            <div>
-                <h3>Messages from Parent</h3>
-                <ul>
-                    {messages.map((message) => (
-                        <li key={message.id}>{message.text}</li>
-                    ))}
-                </ul>
-            </div>
+            <p>Welcome, {currentUser ? currentUser.username : "User"}! Here are your assigned chores.</p>
+            <ul>
+                {chores.map(chore => (
+                    <li key={chore.id} style={{ textDecoration: chore.completed ? "line-through" : "none" }}>
+                        {chore.text}
+                        <button onClick={() => toggleComplete(chore.id)}>
+                            {chore.completed ? "Undo" : "Complete"}
+                        </button>
+                    </li>
+                ))}
+            </ul>
         </div>
     );
 }
