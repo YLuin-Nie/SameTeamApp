@@ -1,105 +1,84 @@
-import React, { useState } from 'react';
-import MessageModal from './MessageModal'; // Import the modal component
+// File Name: ParentDashboard.js
+
+import React, { useState, useEffect } from 'react';
+import { getCurrentUser, getUsers, getChores, addChoreToStorage } from "./utils/localStorageUtils"; 
 
 function ParentDashboard() {
-    const [chores, setChores] = useState([]);
-    const [newChore, setNewChore] = useState('');
-    const [chorePoints, setChorePoints] = useState(10);
-    const [points, setPoints] = useState(0);
-    const [messages, setMessages] = useState([]);
-    const [newMessage, setNewMessage] = useState('');
+    const [chores, setChores] = useState([]); // ✅ State to store chores
+    const [newChore, setNewChore] = useState(''); // ✅ State to track new chore input
+    const [assignedTo, setAssignedTo] = useState(''); // ✅ State to track chore assignment
+    const [chorePoints, setChorePoints] = useState(10); // ✅ Default points for each chore
 
-    // State to control the visibility of the message modal
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    // ✅ Get list of children from localStorage
+    const familyMembers = getUsers().filter(user => user.role === "Child");
 
-    // State for family members and their assigned chores
-    const [familyMembers, setFamilyMembers] = useState([
-        { name: 'Ethan', chores: ['Take out the trash', 'Clean your room'] },
-        { name: 'Olivia', chores: ['Do your homework'] }
-    ]);
+    // ✅ Get logged-in parent details
+    const currentUser = getCurrentUser(); 
 
-    // Function to handle adding a new chore
+    // ✅ Load chores from localStorage when component mounts
+    useEffect(() => {
+        setChores(getChores());
+    }, []);
+
+    // ✅ Function to add a new chore
     const addChore = () => {
-        if (newChore.trim()) {
-            setChores([...chores, { id: chores.length + 1, text: newChore, completed: false, points: chorePoints }]);
+        if (newChore.trim() && assignedTo) {
+            const newChoreObj = {
+                id: Date.now(), // ✅ Use unique ID based on timestamp
+                text: newChore,
+                completed: false,
+                points: chorePoints,
+                assignedTo
+            };
+
+            addChoreToStorage(newChoreObj); // ✅ Save chore in localStorage
+            setChores([...chores, newChoreObj]); // ✅ Update state
             setNewChore('');
-            setChorePoints(10); // Reset points input
-        }
-    };
-
-    // Function to open the message modal
-    const openModal = () => {
-        setIsModalOpen(true);
-    };
-
-    // Function to close the message modal
-    const closeModal = () => {
-        setIsModalOpen(false);
-    };
-
-    // Function to send a message to the child
-    const sendMessage = () => {
-        if (newMessage.trim()) {
-            setMessages([...messages, { id: messages.length + 1, text: newMessage }]);
-            setNewMessage(''); // Reset message input after sending
+            setChorePoints(10);
+            setAssignedTo('');
         }
     };
 
     return (
         <div>
             <h2>Parent Dashboard</h2>
-            <p>Welcome, Parent! You can manage chores, points, messages, and levels from here.</p>
-
-            {/* Chore Management */}
+            <p>Welcome, {currentUser ? currentUser.username : "Parent"}! Manage your family's chores here.</p>
+            
+            {/* ✅ Form to Add a New Chore */}
             <div>
                 <h3>Add a Chore</h3>
-                <input
-                    type="text"
-                    value={newChore}
-                    onChange={(e) => setNewChore(e.target.value)}
-                    placeholder="Enter a new chore"
+                <input 
+                    type="text" 
+                    value={newChore} 
+                    onChange={(e) => setNewChore(e.target.value)} 
+                    placeholder="Enter a new chore" 
                 />
-                <input
-                    type="number"
-                    value={chorePoints}
-                    onChange={(e) => setChorePoints(Number(e.target.value))}
-                    placeholder="Points"
+                <input 
+                    type="number" 
+                    value={chorePoints} 
+                    onChange={(e) => setChorePoints(Number(e.target.value))} 
+                    placeholder="Points" 
                 />
+                <select value={assignedTo} onChange={(e) => setAssignedTo(e.target.value)}>
+                    <option value="">Assign to...</option>
+                    {familyMembers.map(member => (
+                        <option key={member.username} value={member.username}>{member.username}</option>
+                    ))}
+                </select>
                 <button onClick={addChore}>Add Chore</button>
             </div>
 
-            {/* Family Members Section */}
+            {/* ✅ Display Existing Chores */}
             <div>
-                <h3>Family Members</h3>
+                <h3>Chore List</h3>
                 <ul>
-                    {familyMembers.map((member, index) => (
-                        <li key={index}>
-                            <strong>{member.name}</strong>
-                            <ul>
-                                {member.chores.map((chore, idx) => (
-                                    <li key={idx}>{chore}</li>
-                                ))}
-                            </ul>
+                    {chores.map(chore => (
+                        <li key={chore.id} style={{ textDecoration: chore.completed ? "line-through" : "none" }}>
+                            {chore.text} (Assigned to: {chore.assignedTo}) - {chore.completed ? "Completed" : "Pending"}
                         </li>
                     ))}
                 </ul>
             </div>
-
-            {/* Messages Section */}
-            <div>
-                <h3>Messages</h3>
-                <button onClick={openModal}>View Messages</button>
-                <input
-                    type="text"
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    placeholder="Enter your message"
-                />
-                <button onClick={sendMessage}>Send Message</button>
-            </div>
-
-            {/* Message Modal */}
-            <MessageModal isOpen={isModalOpen} onClose={closeModal} messages={messages} />
         </div>
     );
 }
