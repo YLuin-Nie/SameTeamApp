@@ -1,3 +1,4 @@
+
 body {
   display: flex;
   justify-content: center; /* Centers horizontally */
@@ -20,6 +21,7 @@ body {
   background-color: white;
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
+
 
 body.dark-mode .App {
   background:  #280137; /* Dark background */
@@ -202,6 +204,7 @@ form div {
   margin-bottom: 10px;
 }
 
+/* Centering the button within its container */
 button {
   padding: 10px;
   background-color: #3749eb;
@@ -210,7 +213,12 @@ button {
   border-radius: 5px;
   cursor: pointer;
   width: 100%;
+  margin: 5px;
+  display: flex;
+  justify-content: center; /* Center the content horizontally */
+  align-items: center; /* Center the content vertically */
 }
+
 body.dark-mode button {
   padding: 10px;
   background-color: #9014ca;
@@ -219,12 +227,33 @@ body.dark-mode button {
   border-radius: 5px;
   cursor: pointer;
   width: 100%;
+  margin: 5px;
+  display: flex;
+  justify-content: center; /* Center the content horizontally */
+  align-items: center; /* Center the content vertically */
 }
 
 button:hover {
   background-color: #2004ad;
 }
 
+body.dark-mode button:hover {
+  background-color: #5400b3;
+}
+
+/* Centering the button container */
+.form-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center the button container horizontally */
+}
+
+button:hover {
+  background-color: #2004ad;
+}
+body.dark-mode button:hover {
+  background-color: #5400b3;
+}
 select, input {
   width: 100%;
   padding: 8px;
@@ -321,3 +350,17 @@ body.dark-mode li {
 body.dark-mode .modal-content button:hover {
   background-color: #5400b3; /* Hover effect in dark mode */
 }
+
+.logo {
+  margin-bottom: 40px; /* Add space below the logo */
+}
+
+body.dark-mode .logo img {
+  filter: drop-shadow(0 0 40px rgba(255, 255, 255, 1)); /* Maximum glow effect */
+}
+
+
+
+
+
+
