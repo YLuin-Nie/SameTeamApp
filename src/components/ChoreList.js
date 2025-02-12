@@ -1,43 +1,49 @@
-import React, { useState } from 'react';
+/// File Name: ChoreList.js
+
+import React, { useState, useEffect } from 'react';
+import { getCurrentUser, getUsers } from "../utils/localStorageUtils"; // ✅ Import functions from localStorageUtils
+
+// ✅ Function to retrieve chores from localStorage
+const getChores = () => JSON.parse(localStorage.getItem("chores")) || [];
+
+// ✅ Function to update chores in localStorage
+const updateChoresInStorage = (chores) => {
+    localStorage.setItem("chores", JSON.stringify(chores));
+};
 
 function ChoreList() {
-    // Define state to hold the list of chores
-    const [chores, setChores] = useState([
-        { id: 1, text: 'Take out the trash', completed: false },
-        { id: 2, text: 'Clean the dishes', completed: false }
-    ]);
+    const [chores, setChores] = useState([]);
+    const currentUser = getCurrentUser(); // ✅ Get the logged-in user
 
-    // Define state to handle input for new chores
-    const [newChore, setNewChore] = useState("");
+    // ✅ Load chores from localStorage when component mounts
+    useEffect(() => {
+        setChores(getChores());
+    }, []);
 
-    // Function to add a new chore
-    const addChore = () => {
-        if (newChore.trim()) {
-            setChores([...chores, { id: chores.length + 1, text: newChore, completed: false }]);
-            setNewChore(""); // Reset input field
-        }
-    };
-
-    // Function to mark a chore as completed
+    // ✅ Function to toggle chore completion status
     const toggleComplete = (id) => {
-        setChores(chores.map(chore =>
+        const updatedChores = chores.map(chore =>
             chore.id === id ? { ...chore, completed: !chore.completed } : chore
-        ));
+        );
+        setChores(updatedChores);
+        updateChoresInStorage(updatedChores); // ✅ Persist to localStorage
     };
 
-    // Function to delete a chore
+    // ✅ Function to delete a chore
     const deleteChore = (id) => {
-        setChores(chores.filter(chore => chore.id !== id));
+        const updatedChores = chores.filter(chore => chore.id !== id);
+        setChores(updatedChores);
+        updateChoresInStorage(updatedChores); // ✅ Remove from localStorage
     };
 
     return (
         <div>
             <h2>Chore List</h2>
-
+            <p>Welcome, {currentUser ? currentUser.username : "User"}! Here are your assigned chores.</p>
             <ul>
                 {chores.map(chore => (
                     <li key={chore.id} style={{ textDecoration: chore.completed ? "line-through" : "none" }}>
-                        {chore.text}
+                        {chore.text} (Assigned to: {chore.assignedTo})
                         <button onClick={() => toggleComplete(chore.id)}>
                             {chore.completed ? "Undo" : "Complete"}
                         </button>
@@ -45,17 +51,8 @@ function ChoreList() {
                     </li>
                 ))}
             </ul>
-
-            <input
-                type="text"
-                value={newChore}
-                onChange={(e) => setNewChore(e.target.value)}
-                placeholder="New chore"
-            />
-            <button onClick={addChore}>Add Chore</button>
         </div>
     );
 }
 
 export default ChoreList;
-
