@@ -1,62 +1,49 @@
+// File Name: SignUp.js
+
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import navigation
-import bcrypt from "bcryptjs"; 
+import { useNavigate } from "react-router-dom";
+import bcrypt from "bcryptjs";
+import { getUsers, saveUsers, initializeLocalStorage } from "./utils/localStorageUtils";
 import "../components/styles/signup.css";
 
 const SignUp = () => {
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate();
+  initializeLocalStorage(); // Ensure local storage is initialized
 
   const [formData, setFormData] = useState({
-    name: "",
+    username: "",
     email: "",
     password: "",
     role: "Parent",
+    team: "ABY", // Default team
   });
 
   const [errors, setErrors] = useState("");
 
-  const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
-  const validatePassword = (password) => password.length >= 6;
-  const sanitizeInput = (input) => input.trim().replace(/<[^>]+>/g, "");
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { name, email, password, role } = formData;
-
-    const cleanName = sanitizeInput(name);
-    const cleanEmail = sanitizeInput(email);
-    const cleanPassword = sanitizeInput(password);
-
-    if (!cleanName || !validateEmail(cleanEmail) || !validatePassword(cleanPassword)) {
-      setErrors("Invalid input. Ensure all fields are correctly filled.");
-      return;
-    }
-
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-
-    if (users.some((user) => user.email === cleanEmail)) {
+    const { username, email, password, role, team } = formData;
+    
+    const users = getUsers(); // Fetch users from localStorage
+    if (users.some((user) => user.email.toLowerCase() === email.toLowerCase())) {
       setErrors("Email already registered.");
       return;
     }
 
-    const hashedPassword = bcrypt.hashSync(cleanPassword, 10);
-
-    const newUser = { name: cleanName, email: cleanEmail, password: hashedPassword, role };
-    users.push(newUser);
-    localStorage.setItem("users", JSON.stringify(users));
+    const hashedPassword = bcrypt.hashSync(password, 10);
+    users.push({ username, email, password: hashedPassword, role, team });
+    saveUsers(users); // ✅ Properly update users in localStorage
 
     alert("Sign-up successful! Proceeding to profile setup...");
-
-    // ✅ Navigate to Profile Setup Page
     navigate("/profile-setup");
   };
 
   return (
     <div className="signup-container">
-      <h1>Sign Up</h1>
+      <h2>Sign Up</h2>
       {errors && <p style={{ color: "red" }}>{errors}</p>}
       <form onSubmit={handleSubmit}>
-        <input type="text" placeholder="Name" onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
+        <input type="text" placeholder="Username" onChange={(e) => setFormData({ ...formData, username: e.target.value })} required />
         <input type="email" placeholder="Email" onChange={(e) => setFormData({ ...formData, email: e.target.value })} required />
         <input type="password" placeholder="Password (min 6 chars)" onChange={(e) => setFormData({ ...formData, password: e.target.value })} required />
         <button type="submit">Sign Up</button>
