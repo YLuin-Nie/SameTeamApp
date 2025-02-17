@@ -1,17 +1,23 @@
 import './App.css';
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { initializeLocalStorage, getCurrentUser, authenticateUser, logoutUser } from "./components/utils/localStorageUtils";
-import SignUp from './components/SignUp';
-import SignIn from './components/SignIn';
-import ProfileSetup from './components/ProfileSetup';
-import ParentDashboard from './components/ParentDashboard';
-import ChildDashboard from './components/ChildDashboard';
-import HomePage from './components/HomePage'; // Import your new HomePage component
+import SignUp from './components/pages/SignUp';
+import SignIn from './components/pages/SignIn';
+import ProfileSetup from './components/pages/ProfileSetup';
+import ParentDashboard from './components/pages/ParentDashboard';
+import ChildDashboard from './components/pages/ChildDashboard';
+import ChildRewards from './components/pages/ChildRewards';
+import ParentRewards from './components/pages/ParentRewards';
+import HomePage from './components/pages/HomePage';
+import AddChore from './components/pages/AddChore';
+import NavBar from './components/pages/NavBar';
+import ChoresList from './components/pages/ChoresList';
 
 function App() {
     const [currentUser, setCurrentUser] = useState(null);
     const [darkMode, setDarkMode] = useState(false);
+    const [chores, setChores] = useState([]);
 
     useEffect(() => {
         initializeLocalStorage();
@@ -26,6 +32,9 @@ function App() {
         const storedDarkMode = localStorage.getItem("darkMode") === "true";
         setDarkMode(storedDarkMode);
         document.body.classList.toggle("dark-mode", storedDarkMode);
+
+        const storedChores = JSON.parse(localStorage.getItem("chores")) || [];
+        setChores(storedChores);
     }, []);
 
     const toggleDarkMode = () => {
@@ -39,10 +48,13 @@ function App() {
 
     function AppRoutes() {
         const navigate = useNavigate();
+        const location = useLocation();
 
         useEffect(() => {
             const user = getCurrentUser();
-            if (user) {
+            const currentPath = window.location.pathname;
+            
+            if (user && !["/parent-rewards", "/child-rewards", "/signup", "/profile-setup", "/add-chores", "/chores-list"].includes(currentPath)) {
                 if (user.role === "Parent") {
                     navigate("/parent-dashboard");
                 } else {
@@ -72,42 +84,59 @@ function App() {
             }
         };
 
+        const hideNavBarRoutes = ["/", "/signin", "/signup", "/profile-setup"];
+
         return (
-            <Routes>
-                {/* Home route with Sign Up and Login buttons */}
-                <Route path="/" element={<HomePage />} />  
-                <Route path="/signup" element={<SignUp />} />
-                <Route path="/profile-setup" element={<ProfileSetup />} />
-                <Route path="/parent-dashboard" element={<ParentDashboard />} />
-                <Route path="/child-dashboard" element={<ChildDashboard />} />
-                <Route path="/signin" element={<SignIn onSignInSuccess={handleSignInSuccess} />} />
-            </Routes>
+            <div className="flex">
+                {!hideNavBarRoutes.includes(location.pathname) && <NavBar currentUser={currentUser} setCurrentUser={setCurrentUser} />}
+                <div className={`flex-1 ${hideNavBarRoutes.includes(location.pathname) ? "w-full" : "ml-64"}`}>
+                    <Routes>
+                        <Route path="/" element={<HomePage />} />
+                        <Route path="/signin" element={<SignIn onSignInSuccess={handleSignInSuccess} />} />
+                        <Route path="/signup" element={<SignUp />} />
+                        <Route path="/profile-setup" element={<ProfileSetup />} />
+                        <Route path="/parent-dashboard" element={<ParentDashboard />} />
+                        <Route path="/child-dashboard" element={<ChildDashboard />} />
+                        <Route path="/child-rewards" element={<ChildRewards />} />
+                        <Route path="/parent-rewards" element={<ParentRewards />} />
+                        <Route path="/add-chores" element={<AddChore addNewChore={addNewChore} />} />
+                        <Route 
+                            path="/chores-list" 
+                            element={<ChoresList chores={chores} toggleChoreCompletion={toggleChoreCompletion} />} 
+                        />
+                    </Routes>
+                </div>
+            </div>
         );
     }
+
+    const addNewChore = (chore) => {
+        const updatedChores = [...chores, { ...chore, id: Date.now(), completed: false }];
+        setChores(updatedChores);
+        localStorage.setItem("chores", JSON.stringify(updatedChores));
+    };
+
+    const toggleChoreCompletion = (id) => {
+        const updatedChores = chores.map(chore =>
+            chore.id === id ? { ...chore, completed: !chore.completed } : chore
+        );
+        setChores(updatedChores);
+        localStorage.setItem("chores", JSON.stringify(updatedChores));
+    };
 
     return (
         <Router>
             <div className={`App ${darkMode ? "dark" : "light"}`}>
                 <div className="toggle-container">
                     <div className={`toggle ${darkMode ? 'night' : ''}`} onClick={toggleDarkMode}>
-                        <div className={`notch`}>
+                        <div className="notch">
                             <div className="crater"></div>
                             <div className="crater"></div>
                         </div>
-                        <div className={`shape sm`}></div>
-                        <div className={`shape md`}></div>
-                        <div className={`shape lg`}></div>
+                        <div className="shape sm"></div>
+                        <div className="shape md"></div>
+                        <div className="shape lg"></div>
                     </div>
-                </div>
-
-                <div className="button-container">
-                    {currentUser && (
-                        <button onClick={() => {
-                            logoutUser();
-                            setCurrentUser(null);
-                            window.location.href = "/"; // Redirect to sign-in page
-                        }}>Logout</button>
-                    )}
                 </div>
 
                 <AppRoutes />
