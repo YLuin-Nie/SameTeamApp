@@ -500,3 +500,122 @@ body.dark-mode .logo img {
   filter: drop-shadow(0 0 40px rgba(255, 255, 255, 1)); /* Maximum glow effect */
 }
 
+.chore-list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: #f1f1f1;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.chore-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.chore-actions button {
+  padding: 5px 8px;
+  font-size: 0.8rem;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #3749eb;
+  color: white;
+  border: none;
+  position: relative;
+}
+
+.chore-actions button:hover {
+  background-color: #2004ad;
+}
+
+/* Tooltip styling */
+.chore-actions button[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+
+.chore-actions select {
+  font-size: 0.8rem;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.level-badge {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 10px;
+  color: white;
+  font-weight: bold;
+  margin-left: 10px;
+}
+
+.level-badge-container {
+  font-size: 1.2rem;
+  margin: 5px 0;
+}
+
+.reward-list {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+}
+
+.reward-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: #f1f1f1;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.reward-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.reward-actions button {
+  padding: 5px 8px;
+  font-size: 0.8rem;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #3749eb;
+  color: white;
+  border: none;
+  position: relative;
+}
+
+.reward-actions button:hover {
+  background-color: #2004ad;
+}
+
+/* Tooltip styling */
+.reward-actions button[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  white-space: nowrap;
+}

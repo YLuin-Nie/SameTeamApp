@@ -13,20 +13,17 @@ const ChoresCalendar = ({ chores, toggleChoreCompletion }) => {
 
     // Ensure chores are filtered based on a valid date
     const tasksForDate = chores.filter(chore => {
-      const choreDate = new Date(chore.date);
-      
-      // Log chore date to check if it's valid
-      console.log('Chore date:', choreDate);
-
+      const choreDate = new Date(chore.date + 'T00:00:00');
+  
       // Check if chore date is valid
       if (isNaN(choreDate)) {
-        console.warn(`Invalid date for chore:`, chore);
-        return false; // Skip this chore if the date is invalid
+          console.warn(`Invalid date for chore:`, chore);
+          return false; // Skip this chore if the date is invalid
       }
-
-      // Compare ISO strings for consistent date matching (strip time component)
-      return choreDate.toISOString().split('T')[0] === date.toISOString().split('T')[0];
-    });
+  
+      // Compare using local time to avoid shifts
+      return choreDate.toDateString() === date.toDateString();
+  });  
 
     console.log('Tasks for selected date:', tasksForDate);
     setTasks(tasksForDate);

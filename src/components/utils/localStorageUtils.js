@@ -96,3 +96,19 @@ export const getUserPoints = (username) => {
     const user = users.find(user => user.username === username);
     return user ? user.points || 0 : 0;
 };
+
+// Leveling system based on points
+export const getUserLevel = (points) => {
+    if (points >= 1000) return { level: 5, name: "Master", color: "red" };
+    if (points >= 600) return { level: 4, name: "Elite", color: "orange" };
+    if (points >= 400) return { level: 3, name: "Challenger", color: "green" };
+    if (points >= 200) return { level: 2, name: "Apprentice", color: "blue" };
+    return { level: 1, name: "Beginner", color: "brown" };
+};
+
+// Retrieve user level from points
+export const getUserLevelFromStorage = (username) => {
+    const users = getUsers();
+    const user = users.find(user => user.username === username);
+    return user ? getUserLevel(user.points || 0) : { level: 1, name: "Beginner", color: "brown" };
+};

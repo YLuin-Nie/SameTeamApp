@@ -14,8 +14,8 @@ const SignUp = () => {
     username: "",
     email: "",
     password: "",
-    role: "Parent",
-    team: "ABY", // Default team
+    role: "",  // ✅ Allow user to select Parent or Child
+    team: "ABY",
   });
 
   const [errors, setErrors] = useState("");
@@ -23,19 +23,34 @@ const SignUp = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { username, email, password, role, team } = formData;
-    
-    const users = getUsers(); // Fetch users from localStorage
+
+    if (!role) {
+      setErrors("Please select a role (Parent or Child).");
+      return;
+    }
+
+    const users = getUsers();
     if (users.some((user) => user.email.toLowerCase() === email.toLowerCase())) {
       setErrors("Email already registered.");
       return;
     }
 
     const hashedPassword = bcrypt.hashSync(password, 10);
-    users.push({ username, email, password: hashedPassword, role, team });
+    const newUser = { username, email, password: hashedPassword, role, team };
+
+    users.push(newUser);
     saveUsers(users); // ✅ Properly update users in localStorage
 
-    alert("Sign-up successful! Proceeding to profile setup...");
-    navigate("/profile-setup");
+    localStorage.setItem("loggedInUser", JSON.stringify(newUser)); // ✅ Store the new user as logged in
+
+    alert("Sign-up successful! Redirecting to dashboard...");
+
+    // ✅ Redirect user immediately to the correct dashboard
+    if (role === "Parent") {
+      navigate("/parent-dashboard");
+    } else {
+      navigate("/child-dashboard");
+    }
   };
 
   return (
@@ -43,11 +58,37 @@ const SignUp = () => {
       <h2>Sign Up</h2>
       {errors && <p style={{ color: "red" }}>{errors}</p>}
       <form onSubmit={handleSubmit}>
-        <input type="text" placeholder="Username" onChange={(e) => setFormData({ ...formData, username: e.target.value })} required />
-        <input type="email" placeholder="Email" onChange={(e) => setFormData({ ...formData, email: e.target.value })} required />
-        <input type="password" placeholder="Password (min 6 chars)" onChange={(e) => setFormData({ ...formData, password: e.target.value })} required />
+        <input
+          type="text"
+          placeholder="Username"
+          onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+          required
+        />
+        <input
+          type="email"
+          placeholder="Email"
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Password (min 6 chars)"
+          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+          required
+        />
+
+        {/* ✅ Role Selection */}
+        <label>Select Role:</label>
+        <select value={formData.role} onChange={(e) => setFormData({ ...formData, role: e.target.value })}>
+          <option value="">Select...</option>
+          <option value="Parent">Parent</option>
+          <option value="Child">Child</option>
+        </select>
+
         <button type="submit">Sign Up</button>
       </form>
+
+      <button className="back-button" onClick={() => navigate("/")}>Back to Home</button>
     </div>
   );
 };

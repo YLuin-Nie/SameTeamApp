@@ -1,5 +1,10 @@
+// File Name: AddChore.js
+
 import React, { useState, useEffect } from 'react';
-import { getUsers, addChoreToStorage, getChores, saveChores, getUserPoints, updateUserPoints } from "../utils/localStorageUtils";
+import { 
+  getUsers, addChoreToStorage, getChores, saveChores, 
+  getUserPoints, updateUserPoints 
+} from "../utils/localStorageUtils";
 
 const AddChore = () => {
   const [newChore, setNewChore] = useState('');
@@ -7,70 +12,61 @@ const AddChore = () => {
   const [chorePoints, setChorePoints] = useState(10);
   const [choreDate, setChoreDate] = useState('');
   const [chores, setChores] = useState([]);
-  const [deductPointsOnReassign, setDeductPointsOnReassign] = useState({});
+  const [editingChoreId, setEditingChoreId] = useState(null);
+  const [editedChoreText, setEditedChoreText] = useState('');
   const familyMembers = getUsers().filter(user => user.role === "Child");
 
   useEffect(() => {
     setChores(getChores());
   }, []);
 
+  // Add a new chore
   const addChore = () => {
     if (newChore.trim() && assignedTo && choreDate) {
-      const newChoreObj = {
-        id: Date.now(),
-        text: newChore,
-        completed: false,
-        points: chorePoints,
-        assignedTo,
-        date: new Date(choreDate).toISOString() // Ensure the date is in ISO format
-      };
+        // Create a date object in local time
+        const localDate = new Date(choreDate + 'T00:00:00'); 
+        const newChoreObj = {
+            id: Date.now(),
+            text: newChore,
+            completed: false,
+            points: chorePoints,
+            assignedTo,
+            date: localDate.toISOString(), // Store as ISO format, but with a fixed time
+        };
 
-      addChoreToStorage(newChoreObj);
-      setChores([...chores, newChoreObj]);
-      setNewChore('');
-      setChorePoints(10);
-      setAssignedTo('');
-      setChoreDate(''); // Reset the date input
+        addChoreToStorage(newChoreObj);
+        setChores([...chores, newChoreObj]);
+        setNewChore('');
+        setChorePoints(10);
+        setAssignedTo('');
+        setChoreDate('');
     }
   };
 
-  const completeChore = (choreId) => {
+  // Complete/Undo Complete Chore
+  const toggleCompletion = (choreId) => {
     const updatedChores = chores.map(chore =>
-      chore.id === choreId ? { ...chore, completed: true } : chore
+      chore.id === choreId ? { ...chore, completed: !chore.completed } : chore
     );
+
     setChores(updatedChores);
     saveChores(updatedChores);
 
     const chore = chores.find(c => c.id === choreId);
     if (chore) {
       const currentPoints = getUserPoints(chore.assignedTo);
-      updateUserPoints(chore.assignedTo, currentPoints + chore.points);
+      updateUserPoints(chore.assignedTo, chore.completed ? currentPoints - chore.points : currentPoints + chore.points);
     }
   };
 
-  const undoCompleteChore = (choreId) => {
-    const updatedChores = chores.map(chore =>
-      chore.id === choreId ? { ...chore, completed: false } : chore
-    );
-    setChores(updatedChores);
-    saveChores(updatedChores);
-
-    const chore = chores.find(c => c.id === choreId);
-    if (chore) {
-      const currentPoints = getUserPoints(chore.assignedTo);
-      updateUserPoints(chore.assignedTo, Math.max(currentPoints - chore.points, 0));
-    }
+  // Delete a chore
+  const deleteChore = (choreId) => {
+    setChores(chores.filter(chore => chore.id !== choreId));
+    saveChores(chores.filter(chore => chore.id !== choreId));
   };
 
+  // Reassign a chore
   const reassignChore = (choreId, newAssignee) => {
-    const chore = chores.find(c => c.id === choreId);
-    if (!chore) return;
-
-    if (chore.completed && deductPointsOnReassign[choreId]) {
-      const currentPoints = getUserPoints(chore.assignedTo);
-      updateUserPoints(chore.assignedTo, Math.max(currentPoints - chore.points, 0));
-    }
-
     const updatedChores = chores.map(chore =>
       chore.id === choreId ? { ...chore, assignedTo: newAssignee } : chore
     );
@@ -79,8 +75,26 @@ const AddChore = () => {
     saveChores(updatedChores);
   };
 
+  // Start editing a chore
+  const startEdit = (chore) => {
+    setEditingChoreId(chore.id);
+    setEditedChoreText(chore.text);
+  };
+
+  // Save edited chore
+  const saveEdit = (choreId) => {
+    setChores(chores.map(chore =>
+      chore.id === choreId ? { ...chore, text: editedChoreText } : chore
+    ));
+    saveChores(chores.map(chore =>
+      chore.id === choreId ? { ...chore, text: editedChoreText } : chore
+    ));
+    setEditingChoreId(null);
+  };
+
   return (
     <div>
+      <h2>Chore Management</h2>
       <h3>Add a Chore</h3>
       <input 
         type="text" 
@@ -111,53 +125,59 @@ const AddChore = () => {
       <h3>Chore List</h3>
       <ul>
         {chores.map(chore => (
-          <li key={chore.id}>
-            <span style={{ textDecoration: chore.completed ? "line-through" : "none" }}>
-              {chore.text} (Assigned to: {chore.assignedTo}) - {chore.completed ? "Completed" : "Pending"}
-            </span>
-
-            {/* Show Complete Button ONLY if task is pending */}
-            {!chore.completed && (
-              <button onClick={() => completeChore(chore.id)} style={{ textDecoration: "none" }}>
-                Complete
-              </button>
-            )}
-
-            {/* Show Undo Complete Button ONLY if task is completed */}
-            {chore.completed && (
-              <button onClick={() => undoCompleteChore(chore.id)} style={{ textDecoration: "none" }}>
-                Undo Complete
-              </button>
-            )}
-
-            {/* Reassign Dropdown */}
-            <select value={chore.assignedTo} onChange={(e) => reassignChore(chore.id, e.target.value)}>
-              {familyMembers.map(member => (
-                <option key={member.username} value={member.username}>
-                  {member.username}
-                </option>
-              ))}
-            </select>
-
-            {/* Show Checkbox if chore is completed for subtracting points */}
-            {chore.completed && (
-              <label>
-                <input
-                  type="checkbox"
-                  checked={deductPointsOnReassign[chore.id] || false}
-                  onChange={(e) =>
-                    setDeductPointsOnReassign({
-                      ...deductPointsOnReassign,
-                      [chore.id]: e.target.checked,
-                    })
-                  }
+          <li key={chore.id} className="chore-list-item">
+            {editingChoreId === chore.id ? (
+              <>
+                <input 
+                  type="text" 
+                  value={editedChoreText} 
+                  onChange={(e) => setEditedChoreText(e.target.value)} 
                 />
-                Subtract points from previous child
-              </label>
+                <button title="Save changes" onClick={() => saveEdit(chore.id)}>💾</button>
+                <button title="Cancel editing" onClick={() => setEditingChoreId(null)}>❌</button>
+              </>
+            ) : (
+              <>
+                <span style={{ textDecoration: chore.completed ? "line-through" : "none" }}>
+                  {chore.text} (Assigned to: {chore.assignedTo})
+                </span>
+
+                <div className="chore-actions">
+                  {!chore.completed && (
+                    <button title="Edit Chore" onClick={() => startEdit(chore)}>✏️</button>
+                  )}
+                  <button 
+                    title={chore.completed ? "Undo Completion" : "Mark as Complete"} 
+                    onClick={() => toggleCompletion(chore.id)}
+                  >
+                    {chore.completed ? "🔄" : "✔️"}
+                  </button>
+                  {!chore.completed && (
+                    <button title="Delete Chore" onClick={() => deleteChore(chore.id)}>🗑️</button>
+                  )}
+                  
+                  {/* Reassign Dropdown */}
+                  {!chore.completed && (
+                    <select 
+                      title="Reassign Chore" 
+                      value={chore.assignedTo} 
+                      onChange={(e) => reassignChore(chore.id, e.target.value)}
+                    >
+                      {familyMembers.map(member => (
+                        <option key={member.username} value={member.username}>
+                          {member.username}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+              </>
             )}
           </li>
         ))}
       </ul>
+
+
     </div>
   );
 };
