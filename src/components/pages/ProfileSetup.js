@@ -2,8 +2,6 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { getCurrentUser } from "../utils/localStorageUtils"; // Removed getTeamName (not in localStorageUtils.js)
 import ParentDashboard from './ParentDashboard';
 import ChildDashboard from './ChildDashboard';
@@ -48,8 +46,8 @@ function ProfileSetup() {
 
     return (
         <div>
-            <div className="header">
-                <h2><FontAwesomeIcon icon={faArrowLeft} onClick={() => navigate(-1)} className="back-arrow" /> Profile Setup</h2>
+            <div className="header"> 
+                <h2>Profile Setup</h2>
             </div>
             <p>Welcome, {currentUser ? currentUser.username : 'User'}!</p>
             <form onSubmit={handleSubmit}>
