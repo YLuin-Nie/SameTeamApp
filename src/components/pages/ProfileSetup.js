@@ -1,7 +1,9 @@
 // File Name: ProfileSetup.js
 
 import React, { useState } from 'react';
-// Import the utility functions from the correct path
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { getCurrentUser } from "../utils/localStorageUtils"; // Removed getTeamName (not in localStorageUtils.js)
 import ParentDashboard from './ParentDashboard';
 import ChildDashboard from './ChildDashboard';
@@ -11,6 +13,7 @@ import "../styles/signup.css";
 const getTeamName = () => localStorage.getItem("teamName") || "";
 
 function ProfileSetup() {
+    const navigate = useNavigate(); // Initialize navigate
     const [role, setRole] = useState(''); // State to store selected role
     const [teamName, setTeamName] = useState(getTeamName()); // Load team name from localStorage
     const [profileComplete, setProfileComplete] = useState(false); // State to track profile completion
@@ -45,7 +48,9 @@ function ProfileSetup() {
 
     return (
         <div>
-            <h2>Profile Setup</h2>
+            <div className="header">
+                <h2><FontAwesomeIcon icon={faArrowLeft} onClick={() => navigate(-1)} className="back-arrow" /> Profile Setup</h2>
+            </div>
             <p>Welcome, {currentUser ? currentUser.username : 'User'}!</p>
             <form onSubmit={handleSubmit}>
                 {/* Role Selection Dropdown */}

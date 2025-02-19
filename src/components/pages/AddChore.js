@@ -141,7 +141,7 @@ const AddChore = () => {
 
             {/* Show Checkbox if chore is completed for subtracting points */}
             {chore.completed && (
-              <label>
+              <label style={{ display: 'flex', alignItems: 'center' }}>
                 <input
                   type="checkbox"
                   checked={deductPointsOnReassign[chore.id] || false}

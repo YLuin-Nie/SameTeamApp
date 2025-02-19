@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import bcrypt from "bcryptjs";
 import { getUsers, saveUsers, initializeLocalStorage } from "../utils/localStorageUtils";
 import "../styles/signup.css";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faEyeSlash, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -19,6 +21,7 @@ const SignUp = () => {
   });
 
   const [errors, setErrors] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // State to manage password visibility
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,12 +43,28 @@ const SignUp = () => {
 
   return (
     <div className="signup-container">
-      <h2>Sign Up</h2>
+      <div className="header">
+        <FontAwesomeIcon icon={faArrowLeft} onClick={() => navigate(-1)} className="back-arrow" />
+        <h2>Sign Up</h2>
+      </div>
       {errors && <p style={{ color: "red" }}>{errors}</p>}
       <form onSubmit={handleSubmit}>
         <input type="text" placeholder="Username" onChange={(e) => setFormData({ ...formData, username: e.target.value })} required />
         <input type="email" placeholder="Email" onChange={(e) => setFormData({ ...formData, email: e.target.value })} required />
-        <input type="password" placeholder="Password (min 6 chars)" onChange={(e) => setFormData({ ...formData, password: e.target.value })} required />
+        <div className="password-container">
+          <input 
+            type={showPassword ? "text" : "password"} 
+            placeholder="Password (min 6 chars)" 
+            onChange={(e) => setFormData({ ...formData, password: e.target.value })} 
+            required 
+          />
+          <span 
+            onClick={() => setShowPassword(!showPassword)} 
+            className={`eye-icon ${showPassword ? 'open' : 'closed'}`}
+          >
+            <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
+          </span>
+        </div>
         <button type="submit">Sign Up</button>
       </form>
     </div>
