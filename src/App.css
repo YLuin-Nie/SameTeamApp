@@ -619,3 +619,49 @@ body.dark-mode .logo img {
   font-size: 0.7rem;
   white-space: nowrap;
 }
+
+.password-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-container input {
+  flex: 1;
+}
+
+.eye-icon {
+  color:#280137;
+  position: absolute;
+  right: 20px;
+  cursor: pointer;
+}
+/* File Name: signup.css */
+
+.signup-container .header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.back-arrow {
+  position: absolute;
+  left: 0;
+  cursor: pointer;
+  font-size: 24px;
+  color: #007bff;
+}
+
+.back-arrow:hover {
+  color: #0056b3;
+}
+
+.dark-mode .back-arrow {
+  color: #9014ca;
+}
+
+.dark-mode .back-arrow:hover {
+  color: #a20eb0;
+}

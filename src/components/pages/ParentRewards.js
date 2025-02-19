@@ -1,18 +1,15 @@
 // File Name: ParentRewards.js
 
 import React, { useState, useEffect } from "react";
-import { getCurrentUser, getUsers, saveUsers } from "../utils/localStorageUtils";
+import { getUsers, saveUsers, getRedeemedRewards, storeRedeemedReward, addRewardAsCompletedChore, saveRewards, getRewards } from "../utils/localStorageUtils";
 
 function ParentRewards() {
     const [children, setChildren] = useState([]);
     const [selectedChild, setSelectedChild] = useState("");
     const [rewardName, setRewardName] = useState("");
     const [rewardPoints, setRewardPoints] = useState(10);
-    const [rewards, setRewards] = useState([
-        { id: 1, name: "Go out and eat", cost: 50 },
-        { id: 2, name: "No Chores Day", cost: 75 },
-        { id: 3, name: "Go to the Movies", cost: 100 }
-    ]);
+    const [redeemedRewards, setRedeemedRewards] = useState([]);
+    const [rewards, setRewards] = useState([]);
     const [editingReward, setEditingReward] = useState(null);
     const [editedRewardName, setEditedRewardName] = useState("");
     const [editedRewardCost, setEditedRewardCost] = useState(0);
@@ -21,6 +18,10 @@ function ParentRewards() {
         const users = getUsers();
         const childUsers = users.filter(user => user.role === "Child");
         setChildren(childUsers);
+
+        // Load rewards and redeemed rewards
+        setRewards(getRewards());
+        setRedeemedRewards(getRedeemedRewards());
     }, []);
 
     const rewardChild = () => {
@@ -39,6 +40,10 @@ function ParentRewards() {
         });
 
         saveUsers(updatedUsers);
+
+        // ✅ Store reward as a completed chore
+        addRewardAsCompletedChore(selectedChild, rewardName, rewardPoints);
+
         alert(`Successfully rewarded ${rewardPoints} points to ${selectedChild} for ${rewardName}!`);
         
         setSelectedChild("");
@@ -53,14 +58,19 @@ function ParentRewards() {
         }
 
         const newReward = { id: Date.now(), name: rewardName, cost: rewardPoints };
-        setRewards([...rewards, newReward]);
+        const updatedRewards = [...rewards, newReward];
+
+        setRewards(updatedRewards);
+        saveRewards(updatedRewards); // ✅ Store rewards in localStorage
 
         setRewardName("");
         setRewardPoints(10);
     };
 
     const deleteReward = (id) => {
-        setRewards(rewards.filter(reward => reward.id !== id));
+        const updatedRewards = rewards.filter(reward => reward.id !== id);
+        setRewards(updatedRewards);
+        saveRewards(updatedRewards);
     };
 
     const startEdit = (reward) => {
@@ -70,9 +80,11 @@ function ParentRewards() {
     };
 
     const saveEdit = () => {
-        setRewards(rewards.map(reward => 
+        const updatedRewards = rewards.map(reward => 
             reward.id === editingReward ? { ...reward, name: editedRewardName, cost: editedRewardCost } : reward
-        ));
+        );
+        setRewards(updatedRewards);
+        saveRewards(updatedRewards);
         setEditingReward(null);
         setEditedRewardName("");
         setEditedRewardCost(0);
@@ -109,29 +121,47 @@ function ParentRewards() {
 
             <h3>Manage Rewards</h3>
             <ul className="reward-list">
-                {rewards.map((reward) => (
-                    <li key={reward.id} className="reward-item">
-                        {editingReward === reward.id ? (
-                            <>
-                                <input type="text" value={editedRewardName} onChange={(e) => setEditedRewardName(e.target.value)} />
-                                <input type="number" value={editedRewardCost} onChange={(e) => setEditedRewardCost(Number(e.target.value))} />
-                                <button title="Save Changes" onClick={saveEdit}>💾</button>
-                                <button title="Cancel Editing" onClick={() => setEditingReward(null)}>❌</button>
-                            </>
-                        ) : (
-                            <>
-                                <span>{reward.name} - {reward.cost} Points</span>
-                                <div className="reward-actions">
-                                    <button title="Edit Reward" onClick={() => startEdit(reward)}>✏️</button>
-                                    <button title="Delete Reward" onClick={() => deleteReward(reward.id)}>🗑️</button>
-                                </div>
-                            </>
-                        )}
-                    </li>
-                ))}
+                {rewards.length === 0 ? <p>No rewards defined yet.</p> :
+                    rewards.map((reward) => (
+                        <li key={reward.id} className="reward-item">
+                            {editingReward === reward.id ? (
+                                <>
+                                    <input type="text" value={editedRewardName} onChange={(e) => setEditedRewardName(e.target.value)} />
+                                    <input type="number" value={editedRewardCost} onChange={(e) => setEditedRewardCost(Number(e.target.value))} />
+                                    <button title="Save Changes" onClick={saveEdit}>💾</button>
+                                    <button title="Cancel Editing" onClick={() => setEditingReward(null)}>❌</button>
+                                </>
+                            ) : (
+                                <>
+                                    <span>{reward.name} - {reward.cost} Points</span>
+                                    <div className="reward-actions">
+                                        <button title="Edit Reward" onClick={() => startEdit(reward)}>✏️</button>
+                                        <button title="Delete Reward" onClick={() => deleteReward(reward.id)}>🗑️</button>
+                                    </div>
+                                </>
+                            )}
+                        </li>
+                    ))
+                }
             </ul>
+
+            <hr />
+
+            <h3>Redeemed Rewards History</h3>
+            {redeemedRewards.length === 0 ? (
+                <p>No rewards redeemed yet.</p>
+            ) : (
+                <ul className="redeemed-reward-list">
+                    {redeemedRewards.map(reward => (
+                        <li key={reward.id}>
+                            {reward.username} redeemed "{reward.rewardName}" for {reward.pointsSpent} points on {new Date(reward.date).toLocaleDateString()}
+                        </li>
+                    ))}
+                </ul>
+            )}
         </div>
     );
 }
 
 export default ParentRewards;
+

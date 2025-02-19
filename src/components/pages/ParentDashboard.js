@@ -36,6 +36,9 @@ function ParentDashboard() {
             return next7Days.includes(choreDate.toISOString().split('T')[0]);
         });
 
+        // ✅ Sort chores by date in ascending order
+        upcomingChores.sort((a, b) => new Date(a.date) - new Date(b.date));
+
         setTasksForNext7Days(upcomingChores);
     }, [chores]);
 
@@ -59,6 +62,9 @@ function ParentDashboard() {
 
             return choreDate.toISOString().split('T')[0] === date.toISOString().split('T')[0];
         });
+
+        // ✅ Sort selected chores by date in ascending order
+        selectedChores.sort((a, b) => new Date(a.date) - new Date(b.date));
 
         setTasksForSelectedDate(selectedChores);
     };

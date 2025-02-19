@@ -1,29 +1,21 @@
 // File Name: ChildRewards.js
 
 import React, { useState, useEffect } from "react";
-import { getCurrentUser, getUsers, saveUsers } from "../utils/localStorageUtils";
-
+import { getCurrentUser, getUsers, saveUsers, getUnspentPoints, getRewards, storeRedeemedReward, getRedeemedRewards } from "../utils/localStorageUtils";
 
 function ChildRewards() {
     const [points, setPoints] = useState(0);
+    const [rewards, setRewards] = useState([]);
+    const [redeemedRewards, setRedeemedRewards] = useState([]);
     const currentUser = getCurrentUser();
 
     useEffect(() => {
         if (currentUser) {
-            const users = getUsers();
-            const currentUserData = users.find(user => user.username === currentUser.username);
-            if (currentUserData) {
-                setPoints(currentUserData.points || 0);
-            }
+            setPoints(getUnspentPoints(currentUser.username));
+            setRewards(getRewards()); // ✅ Load rewards from localStorage
+            setRedeemedRewards(getRedeemedRewards().filter(reward => reward.username === currentUser.username)); // ✅ Load redeemed rewards
         }
     }, [currentUser]);
-
-    // Predefined rewards
-    const rewards = [
-        { name: "Go out and eat", cost: 50 },
-        { name: "No Chores Day", cost: 75 },
-        { name: "Go to the Movies", cost: 100 }
-    ];
 
     // Function to purchase a reward
     const purchaseReward = (reward) => {
@@ -35,8 +27,25 @@ function ChildRewards() {
                 }
                 return user;
             });
+
             saveUsers(updatedUsers);
             setPoints(prevPoints => prevPoints - reward.cost);
+
+            // ✅ Store redeemed reward
+            storeRedeemedReward(currentUser.username, reward.name, reward.cost);
+
+            // ✅ Update redeemed rewards in UI
+            setRedeemedRewards(prevRewards => [
+                ...prevRewards,
+                {
+                    id: Date.now(),
+                    username: currentUser.username,
+                    rewardName: reward.name,
+                    pointsSpent: reward.cost,
+                    date: new Date().toISOString(),
+                }
+            ]);
+
             alert(`You have successfully purchased: ${reward.name}`);
         } else {
             alert("Not enough points to purchase this reward.");
@@ -46,15 +55,32 @@ function ChildRewards() {
     return (
         <div className="rewards-container">
             <h2>Available Rewards</h2>
-            <p>Your Points: {points}</p>
+            <p><strong>Unspent Points:</strong> {points}</p>
             <ul>
-                {rewards.map(reward => (
-                    <li key={reward.name}>
-                        {reward.name} - {reward.cost} Points
-                        <button onClick={() => purchaseReward(reward)}>Redeem</button>
-                    </li>
-                ))}
+                {rewards.length === 0 ? <p>No rewards available.</p> :
+                    rewards.map(reward => (
+                        <li key={reward.id}>
+                            {reward.name} - {reward.cost} Points
+                            <button onClick={() => purchaseReward(reward)}>Redeem</button>
+                        </li>
+                    ))
+                }
             </ul>
+
+            <hr />
+
+            <h3>Redeemed Rewards History</h3>
+            {redeemedRewards.length === 0 ? (
+                <p>You have not redeemed any rewards yet.</p>
+            ) : (
+                <ul>
+                    {redeemedRewards.map(reward => (
+                        <li key={reward.id}>
+                            {reward.rewardName} - {reward.pointsSpent} Points (Redeemed on {new Date(reward.date).toLocaleDateString()})
+                        </li>
+                    ))}
+                </ul>
+            )}
         </div>
     );
 }

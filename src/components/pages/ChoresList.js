@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { getCurrentUser, getUserPoints, updateUserPoints, getChores, saveChores } from "../utils/localStorageUtils";
 
 const ChoresList = () => {
-    const [chores, setChores] = useState([]);
+    const [chores, setChores] = useState({ pendingChores: [], completedChores: [] });
     const [points, setPoints] = useState(0);
     const [completionPercentage, setCompletionPercentage] = useState(0);
     const currentUser = getCurrentUser();
@@ -16,11 +16,21 @@ const ChoresList = () => {
 
             const storedChores = getChores();
             const userChores = storedChores.filter(chore => chore.assignedTo === currentUser.username);
-            setChores(userChores);
+
+            // Get today's date and date 7 days ago
+            const today = new Date();
+            const sevenDaysAgo = new Date();
+            sevenDaysAgo.setDate(today.getDate() - 7);
+
+            // Separate chores into pending and completed (only last 7 days)
+            const pendingChores = userChores.filter(chore => !chore.completed);
+            const completedChores = userChores.filter(chore => chore.completed && new Date(chore.date) >= sevenDaysAgo);
+
+            setChores({ pendingChores, completedChores });
 
             // Calculate completion percentage
             if (userChores.length > 0) {
-                const completedTasks = userChores.filter(chore => chore.completed).length;
+                const completedTasks = completedChores.length;
                 setCompletionPercentage(Math.round((completedTasks / userChores.length) * 100));
             } else {
                 setCompletionPercentage(0);
@@ -29,8 +39,8 @@ const ChoresList = () => {
     }, [currentUser]);
 
     const completeChore = (choreId) => {
-        const updatedChores = chores.map(chore => {
-            if (chore.id === choreId && !chore.completed) {
+        const updatedChores = chores.pendingChores.map(chore => {
+            if (chore.id === choreId) {
                 const updatedChore = { ...chore, completed: true };
 
                 const newPoints = points + (chore.points || 0);
@@ -42,12 +52,16 @@ const ChoresList = () => {
             return chore;
         });
 
-        setChores(updatedChores);
-        saveChores(updatedChores);
+        const newCompletedChores = updatedChores.filter(chore => chore.completed);
+        const newPendingChores = updatedChores.filter(chore => !chore.completed);
+
+        setChores({ pendingChores: newPendingChores, completedChores: [...chores.completedChores, ...newCompletedChores] });
+        saveChores([...newPendingChores, ...chores.completedChores, ...newCompletedChores]);
 
         // Recalculate completion percentage
-        const completedTasks = updatedChores.filter(chore => chore.completed).length;
-        setCompletionPercentage(Math.round((completedTasks / updatedChores.length) * 100));
+        const totalTasks = newPendingChores.length + newCompletedChores.length;
+        const completedTasks = newCompletedChores.length;
+        setCompletionPercentage(Math.round((completedTasks / totalTasks) * 100));
     };
 
     return (
@@ -59,18 +73,39 @@ const ChoresList = () => {
             <p><strong>Task Completion Progress:</strong> {completionPercentage}%</p>
             <progress value={completionPercentage} max="100"></progress>
 
-            <ul>
-                {chores.map(chore => (
-                    <li key={chore.id} style={{ textDecoration: chore.completed ? "line-through" : "none" }}>
-                        {chore.text} - {chore.completed ? "✅ Completed" : "⏳ Pending"} ({chore.points} pts)
-                        
-                        {/* ✅ Hide button if the task is completed */}
-                        {!chore.completed && (
+            {/* Pending Chores */}
+            <h3>Pending Chores</h3>
+            {chores.pendingChores.length === 0 ? (
+                <p>No pending chores assigned.</p>
+            ) : (
+                <ul>
+                    {chores.pendingChores.map(chore => (
+                        <li key={chore.id}>
+                            {chore.text} ({chore.points} pts)
+                            <br />
+                            <small>Due: {new Date(chore.date).toDateString()}</small>
+                            <br />
                             <button onClick={() => completeChore(chore.id)}>✔️ Complete</button>
-                        )}
-                    </li>
-                ))}
-            </ul>
+                        </li>
+                    ))}
+                </ul>
+            )}
+
+            {/* Completed Chores (Last 7 Days) */}
+            <h3>Completed Chores (Last 7 Days)</h3>
+            {chores.completedChores.length === 0 ? (
+                <p>No completed chores in the last 7 days.</p>
+            ) : (
+                <ul>
+                    {chores.completedChores.map(chore => (
+                        <li key={chore.id} style={{ textDecoration: "line-through" }}>
+                            {chore.text} ({chore.points} pts)
+                            <br />
+                            <small>Completed on: {new Date(chore.date).toDateString()}</small>
+                        </li>
+                    ))}
+                </ul>
+            )}
         </div>
     );
 };
