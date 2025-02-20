@@ -1,10 +1,8 @@
 // File Name: ProfileSetup.js
 
-// File Name: ProfileSetup.js
-
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
-import { getCurrentUser } from "../utils/localStorageUtils"; // Removed getTeamName (not in localStorageUtils.js)
+import { useNavigate } from 'react-router-dom';
+import { getCurrentUser } from "../utils/localStorageUtils";
 import ParentDashboard from './ParentDashboard';
 import ChildDashboard from './ChildDashboard';
 import "../styles/signup.css";
@@ -13,15 +11,15 @@ import "../styles/signup.css";
 const getTeamName = () => localStorage.getItem("teamName") || "";
 
 function ProfileSetup() {
-    const navigate = useNavigate(); // Initialize navigate
-    const [role, setRole] = useState(''); // State to store selected role
-    const [teamName, setTeamName] = useState(getTeamName()); // Load team name from localStorage
-    const [profileComplete, setProfileComplete] = useState(false); // State to track profile completion
-    const currentUser = getCurrentUser(); // Get logged-in user details
+    const navigate = useNavigate();
+    const [role, setRole] = useState('');
+    const [teamName, setTeamName] = useState(getTeamName());
+    const [profileComplete, setProfileComplete] = useState(false);
+    const currentUser = getCurrentUser();
 
-    // Function to update selected role
-    const handleRoleChange = (e) => {
-        setRole(e.target.value);
+    // Function to handle role selection
+    const handleRoleSelection = (selectedRole) => {
+        setRole(selectedRole);
     };
 
     // Function to update team name
@@ -49,22 +47,29 @@ function ProfileSetup() {
     return (
         <div>
             <div className="header">
-                <h2>ProfileSetup</h2>
+                <h2> Profile Setup</h2>
             </div>
             <p>Welcome, {currentUser ? currentUser.username : 'User'}!</p>
             <form onSubmit={handleSubmit}>
-                {/* Role Selection Dropdown */}
+                {/* Role Selection Buttons */}
                 <div>
-                    <label>
-                        Select Role:
-                        <select value={role} onChange={handleRoleChange}>
-                            <option value="">Select...</option>
-                            <option value="parent">Parent</option>
-                            <option value="child">Child</option>
-                        </select>
-                    </label>
+                    <p>Select Role:</p>
+                    <button
+                        type="button"
+                        className={`role-btn ${role === 'parent' ? 'selected' : ''}`}
+                        onClick={() => handleRoleSelection('parent')}
+                    >
+                        Parent
+                    </button>
+                    <button
+                        type="button"
+                        className={`role-btn ${role === 'child' ? 'selected' : ''}`}
+                        onClick={() => handleRoleSelection('child')}
+                    >
+                        Child
+                    </button>
                 </div>
-                
+
                 {/* Input for Team Name (Only for Parents) */}
                 {role === 'parent' && (
                     <div>

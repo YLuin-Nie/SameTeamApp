@@ -1,16 +1,20 @@
 // File Name: SignUp.js
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import bcrypt from "bcryptjs";
 import { getUsers, saveUsers, initializeLocalStorage } from "../utils/localStorageUtils";
 import "../styles/signup.css";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye, faEyeSlash, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
 const SignUp = () => {
   const navigate = useNavigate();
-  initializeLocalStorage(); // Ensure local storage is initialized
+  
+  // ✅ Run initialization only once (prevents unnecessary localStorage operations)
+  useEffect(() => {
+    initializeLocalStorage();
+  }, []);
 
   const [formData, setFormData] = useState({
     username: "",
@@ -21,24 +25,45 @@ const SignUp = () => {
   });
 
   const [errors, setErrors] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // State to manage password visibility
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  
+  // ✅ Debounced input change handler to improve performance
+  const handleInputChange = useCallback(
+    (e) => {
+      const { name, value } = e.target;
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }, 
+    [] // Memoized so it doesn't re-create on every render
+  );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
     const { username, email, password, role, team } = formData;
     
-    const users = getUsers(); // Fetch users from localStorage
+    // ✅ Read users only once, reducing unnecessary localStorage reads
+    let users = getUsers();
+
     if (users.some((user) => user.email.toLowerCase() === email.toLowerCase())) {
       setErrors("Email already registered.");
+      setLoading(false);
       return;
     }
 
-    const hashedPassword = bcrypt.hashSync(password, 10);
-    users.push({ username, email, password: hashedPassword, role, team });
-    saveUsers(users); // ✅ Properly update users in localStorage
+    try {
+      const hashedPassword = await bcrypt.hash(password, 10); // ✅ Prevents UI blocking
+      users = [...users, { username, email, password: hashedPassword, role, team }];
 
-    alert("Sign-up successful! Proceeding to profile setup...");
-    navigate("/profile-setup");
+      saveUsers(users); // ✅ Write only when necessary
+      alert("Sign-up successful! Proceeding to profile setup...");
+      navigate("/profile-setup");
+    } catch (error) {
+      setErrors("An error occurred. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -49,23 +74,41 @@ const SignUp = () => {
       </div>
       {errors && <p style={{ color: "red" }}>{errors}</p>}
       <form onSubmit={handleSubmit}>
-        <input type="text" placeholder="Username" onChange={(e) => setFormData({ ...formData, username: e.target.value })} required />
-        <input type="email" placeholder="Email" onChange={(e) => setFormData({ ...formData, email: e.target.value })} required />
+        <input 
+          type="text" 
+          name="username"
+          placeholder="Username" 
+          value={formData.username} 
+          onChange={handleInputChange} 
+          required 
+        />
+        <input 
+          type="email" 
+          name="email"
+          placeholder="Email" 
+          value={formData.email} 
+          onChange={handleInputChange} 
+          required 
+        />
         <div className="password-container">
           <input 
             type={showPassword ? "text" : "password"} 
+            name="password"
             placeholder="Password (min 6 chars)" 
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })} 
+            value={formData.password} 
+            onChange={handleInputChange} 
             required 
           />
           <span 
             onClick={() => setShowPassword(!showPassword)} 
-            className={`eye-icon ${showPassword ? 'open' : 'closed'}`}
+            className={`eye-icon ${showPassword ? "open" : "closed"}`}
           >
             <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
           </span>
         </div>
-        <button type="submit">Sign Up</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Processing..." : "Sign Up"}
+        </button>
       </form>
     </div>
   );

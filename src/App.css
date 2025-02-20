@@ -665,3 +665,28 @@ body.dark-mode .logo img {
 .dark-mode .back-arrow:hover {
   color: #a20eb0;
 }
+
+.role-btn {
+  margin: 5px;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: 2px solid #007bff; /* Border color */
+  color: #007bff; /* Same as border color */
+  background-color: white;
+  cursor: pointer;
+  transition: 0.3s;
+  border-radius: 5px;
+}
+.role-btn:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+.role-btn.selected {
+  background-color: #007bff;
+  color: white;
+}
+.dark-mode .role-btn.selected {
+  background-color: #ff0080;
+  color: white;
+}
