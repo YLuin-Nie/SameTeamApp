@@ -41,15 +41,16 @@ const NavBar = ({ currentUser, setCurrentUser }) => {
               </Link>
             </li>
             <li className="navbar-item">
-              <Link to="/child-rewards" className="navbar-link">
-                <i className="fas fa-gift"></i> {/* Child Rewards icon */}
-              </Link>
-            </li>
-            <li className="navbar-item">
               <Link to="/chores-list" className="navbar-link">
                 <i className="fas fa-list"></i> {/* Your Chores icon */}
               </Link>
             </li>
+            <li className="navbar-item">
+              <Link to="/child-rewards" className="navbar-link">
+                <i className="fas fa-gift"></i> {/* Child Rewards icon */}
+              </Link>
+            </li>
+
           </>
         )}
         {currentUser && (

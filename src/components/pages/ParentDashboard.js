@@ -1,121 +1,132 @@
+// File Name: ParentDashboard.js
+
 import React, { useState, useEffect } from 'react';
-import { getCurrentUser, getUsers, getChores, addChoreToStorage, saveChores, getUserPoints, updateUserPoints } from "../utils/localStorageUtils";
-import { useNavigate } from 'react-router-dom';
+import { getUsers, getCurrentUser, getChores, getUserLevelFromStorage } from "../utils/localStorageUtils";
 import Calendar from 'react-calendar';
 
 function ParentDashboard() {
-    const [chores, setChores] = useState([]);
-    const [newChore, setNewChore] = useState('');
-    const [assignedTo, setAssignedTo] = useState('');
-    const [chorePoints, setChorePoints] = useState(10);
-    const [deductPointsOnReassign, setDeductPointsOnReassign] = useState({});
-    const [selectedDate, setSelectedDate] = useState(new Date()); // State for the selected date
-    const [tasksForSelectedDate, setTasksForSelectedDate] = useState([]); // State for tasks on the selected date
+    const [selectedDate, setSelectedDate] = useState(null);
+    const [displayAllTasks, setDisplayAllTasks] = useState(true);
+    const [tasksForSelectedDate, setTasksForSelectedDate] = useState([]);
+    const [tasksForNext7Days, setTasksForNext7Days] = useState([]);
+    const [children, setChildren] = useState([]);
 
-    const navigate = useNavigate();
-    const familyMembers = getUsers().filter(user => user.role === "Child");
+    const chores = getChores();
     const currentUser = getCurrentUser();
 
     useEffect(() => {
-        setChores(getChores());
-    }, []);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const next7Days = [];
+        for (let i = 0; i < 7; i++) {
+            const date = new Date(today);
+            date.setDate(today.getDate() + i);
+            next7Days.push(date.toISOString().split('T')[0]);
+        }
+
+        const upcomingChores = chores.filter(chore => {
+            if (!chore.date || chore.completed) return false;
+
+            const choreDate = new Date(chore.date);
+            choreDate.setHours(0, 0, 0, 0);
+
+            if (isNaN(choreDate.getTime())) return false;
+
+            return next7Days.includes(choreDate.toISOString().split('T')[0]);
+        });
+
+        // ✅ Sort chores by date in ascending order
+        upcomingChores.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        setTasksForNext7Days(upcomingChores);
+    }, [chores]);
 
     useEffect(() => {
-        // Filter chores for the selected date
-        const tasksOnDate = chores.filter(chore => {
-            const choreDate = new Date(chore.date); // Convert chore.date to Date
-            return !isNaN(choreDate) && choreDate.toISOString().split('T')[0] === selectedDate.toISOString().split('T')[0];
+        const childUsers = getUsers().filter(user => user.role === "Child");
+        setChildren(childUsers.map(child => ({
+            ...child,
+            level: getUserLevelFromStorage(child.username)
+        })));
+    }, []);
+
+    const handleDateSelect = (date) => {
+        setSelectedDate(date);
+        setDisplayAllTasks(false);
+
+        const selectedChores = chores.filter(chore => {
+            if (!chore.date) return false;
+
+            const choreDate = new Date(chore.date);
+            choreDate.setHours(0, 0, 0, 0);
+
+            return choreDate.toISOString().split('T')[0] === date.toISOString().split('T')[0];
         });
-        setTasksForSelectedDate(tasksOnDate);
-    }, [selectedDate, chores]);
 
-    const addChore = () => {
-        if (newChore.trim() && assignedTo) {
-            const newChoreObj = {
-                id: Date.now(),
-                text: newChore,
-                completed: false,
-                points: chorePoints,
-                assignedTo,
-                date: selectedDate.toISOString().split('T')[0], // Ensure valid date format
-            };
+        // ✅ Sort selected chores by date in ascending order
+        selectedChores.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-            addChoreToStorage(newChoreObj);
-            setChores([...chores, newChoreObj]);
-            setNewChore('');
-            setChorePoints(10);
-            setAssignedTo('');
-        }
-    };
-
-    const completeChore = (choreId) => {
-        const updatedChores = chores.map(chore =>
-            chore.id === choreId ? { ...chore, completed: true } : chore
-        );
-        setChores(updatedChores);
-        saveChores(updatedChores);
-
-        const chore = chores.find(c => c.id === choreId);
-        if (chore) {
-            const currentPoints = getUserPoints(chore.assignedTo);
-            updateUserPoints(chore.assignedTo, currentPoints + chore.points);
-        }
-    };
-
-    const undoCompleteChore = (choreId) => {
-        const updatedChores = chores.map(chore =>
-            chore.id === choreId ? { ...chore, completed: false } : chore
-        );
-        setChores(updatedChores);
-        saveChores(updatedChores);
-
-        const chore = chores.find(c => c.id === choreId);
-        if (chore) {
-            const currentPoints = getUserPoints(chore.assignedTo);
-            updateUserPoints(chore.assignedTo, Math.max(currentPoints - chore.points, 0));
-        }
-    };
-
-    const reassignChore = (choreId, newAssignee) => {
-        const chore = chores.find(c => c.id === choreId);
-        if (!chore) return;
-
-        if (chore.completed && deductPointsOnReassign[choreId]) {
-            const currentPoints = getUserPoints(chore.assignedTo);
-            updateUserPoints(chore.assignedTo, Math.max(currentPoints - chore.points, 0));
-        }
-
-        const updatedChores = chores.map(chore =>
-            chore.id === choreId ? { ...chore, assignedTo: newAssignee } : chore
-        );
-
-        setChores(updatedChores);
-        saveChores(updatedChores);
+        setTasksForSelectedDate(selectedChores);
     };
 
     return (
         <div className="dashboard parent-dashboard">
             <h2>Parent Dashboard</h2>
-            <hr />
-            <p className="welcome-message">Welcome, {currentUser ? currentUser.username : "Parent"}! Manage your family's chores here.</p>
-            
+            <p>Welcome, {currentUser ? currentUser.username : "Parent"}! Manage your family's progress here.</p>
+
+            <h3>Children's Levels</h3>
+            <ul>
+                {children.map(child => (
+                    <li key={child.username} className="level-badge-container">
+                        <span>{child.username} - </span>
+                        <span className="level-badge" style={{ backgroundColor: child.level.color }}>
+                            Level {child.level.level} - {child.level.name}
+                        </span>
+                        <span> ({child.points || 0} pts)</span>
+                    </li>
+                ))}
+            </ul>
+
             <div className="calendar-tasks-container">
                 <div className="calendar-section">
-                    <Calendar onChange={setSelectedDate} value={selectedDate} />
+                    <Calendar onChange={handleDateSelect} value={selectedDate} />
                 </div>
-                <div className="divider"></div>
+
                 <div className="tasks-section">
-                    <h3>Chores for {selectedDate.toDateString()}</h3>
-                    {tasksForSelectedDate.length === 0 ? (
-                        <p>No chores for this date.</p>
+                    {displayAllTasks ? (
+                        <>
+                            <h3>Upcoming Chores (Next 7 Days)</h3>
+                            {tasksForNext7Days.length === 0 ? (
+                                <p>No upcoming chores.</p>
+                            ) : (
+                                <ul>
+                                    {tasksForNext7Days.map(task => (
+                                        <li key={task.id}>
+                                            <span style={{ fontWeight: "bold" }}>{task.text}</span> 
+                                            <br />
+                                            Assigned to: <span style={{ color: "#FFD700" }}>{task.assignedTo}</span>
+                                            <br />
+                                            <small>Due: {new Date(task.date).toDateString()}</small>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </>
                     ) : (
-                        <ul>
-                            {tasksForSelectedDate.map(task => (
-                                <li key={task.id} style={{ textDecoration: task.completed ? 'line-through' : 'none' }}>
-                                    {task.text} - {task.completed ? 'Completed' : 'Pending'}
-                                </li>
-                            ))}
-                        </ul>
+                        <>
+                            <h3>Chores for {selectedDate ? selectedDate.toDateString() : ''}</h3>
+                            {tasksForSelectedDate.length === 0 ? (
+                                <p>No chores for this date.</p>
+                            ) : (
+                                <ul>
+                                    {tasksForSelectedDate.map(task => (
+                                        <li key={task.id}>
+                                            {task.text} - Assigned to: {task.assignedTo}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </>
                     )}
                 </div>
             </div>

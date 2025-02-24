@@ -1,7 +1,9 @@
+// File Name: App.js
+
 import './App.css';
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { initializeLocalStorage, getCurrentUser, authenticateUser, logoutUser } from "./components/utils/localStorageUtils";
+import { initializeLocalStorage, getCurrentUser, authenticateUser } from "./components/utils/localStorageUtils";
 import SignUp from './components/pages/SignUp';
 import SignIn from './components/pages/SignIn';
 import ProfileSetup from './components/pages/ProfileSetup';
@@ -52,9 +54,7 @@ function App() {
 
         useEffect(() => {
             const user = getCurrentUser();
-            const currentPath = window.location.pathname;
-            
-            if (user && !["/parent-rewards", "/child-rewards", "/signup", "/profile-setup", "/add-chores", "/chores-list"].includes(currentPath)) {
+            if (user && location.pathname === "/") {
                 if (user.role === "Parent") {
                     navigate("/parent-dashboard");
                 } else {
@@ -84,11 +84,14 @@ function App() {
             }
         };
 
+        // Routes where NavBar should be hidden
         const hideNavBarRoutes = ["/", "/signin", "/signup", "/profile-setup"];
 
         return (
             <div className="flex">
+                {/* ✅ Show NavBar on all routes EXCEPT those in `hideNavBarRoutes` */}
                 {!hideNavBarRoutes.includes(location.pathname) && <NavBar currentUser={currentUser} setCurrentUser={setCurrentUser} />}
+                
                 <div className={`flex-1 ${hideNavBarRoutes.includes(location.pathname) ? "w-full" : "ml-64"}`}>
                     <Routes>
                         <Route path="/" element={<HomePage />} />
@@ -99,7 +102,7 @@ function App() {
                         <Route path="/child-dashboard" element={<ChildDashboard />} />
                         <Route path="/child-rewards" element={<ChildRewards />} />
                         <Route path="/parent-rewards" element={<ParentRewards />} />
-                        <Route path="/add-chores" element={<AddChore addNewChore={addNewChore} />} />
+                        <Route path="/add-chores" element={<AddChore />} />
                         <Route 
                             path="/chores-list" 
                             element={<ChoresList chores={chores} toggleChoreCompletion={toggleChoreCompletion} />} 
