@@ -75,9 +75,26 @@ function ChildDashboard() {
       <p>Next Level Progress: {totalPoints - (nextLevelThreshold - 200)} / 200</p>
       <progress value={totalPoints - (nextLevelThreshold - 200)} max="200"></progress>
 
+      <div className="content">
+        <h3>Upcoming Chores</h3>
+        {chores.length === 0 ? (
+          <p>No upcoming chores assigned.</p>
+        ) : (
+          <ul>
+            {chores.map(chore => (
+              <li key={chore.id}>
+                <span><strong>{chore.text}</strong></span> <br />
+                <small>Due: {new Date(chore.date).toDateString()}</small> <br />
+                <span>Points: {chore.points} pts</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
       <div className="calendar-section">
         <ReactCalendar onChange={onChange} value={date} />
-        <div className="tasks-for-date">
+        <div className="tasks-section">
           <h3>Tasks for {date.toDateString()}</h3>
           {tasks.length === 0 ? (
             <p>No tasks for this date.</p>
@@ -95,22 +112,6 @@ function ChildDashboard() {
         </div>
       </div>
 
-      <div className="content">
-        <h3>Upcoming Chores</h3>
-        {chores.length === 0 ? (
-          <p>No upcoming chores assigned.</p>
-        ) : (
-          <ul>
-            {chores.map(chore => (
-              <li key={chore.id}>
-                <span><strong>{chore.text}</strong></span> <br />
-                <small>Due: {new Date(chore.date).toDateString()}</small> <br />
-                <span>Points: {chore.points} pts</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
     </div>
   );
 }
