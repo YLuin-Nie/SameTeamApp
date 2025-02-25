@@ -96,7 +96,6 @@ body.dark-mode .App {
   width: 100%; /* Adjust width as needed */
   max-width: 1200px; /* Set a maximum width */
   padding: 20px;
-  
 }
 .calendar-section {
   flex: 1;

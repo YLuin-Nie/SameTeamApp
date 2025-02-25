@@ -91,9 +91,10 @@ function ChildDashboard() {
           </ul>
         )}
       </div>
-
+<div className="calendar-tasks-container">
       <div className="calendar-section">
         <ReactCalendar onChange={onChange} value={date} />
+        </div>
         <div className="tasks-section">
           <h3>Tasks for {date.toDateString()}</h3>
           {tasks.length === 0 ? (
@@ -110,8 +111,7 @@ function ChildDashboard() {
             </ul>
           )}
         </div>
-      </div>
-
+    </div>
     </div>
   );
 }
