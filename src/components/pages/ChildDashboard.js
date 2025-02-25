@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { getCurrentUser, getUserPoints, getTotalPoints, getUserLevelFromStorage, getChores } from "../utils/localStorageUtils";
 import { useNavigate } from 'react-router-dom';
 import Calendar from 'react-calendar';
+import '../Calendar.css'; 
 
 function ChildDashboard() {
     const [selectedDate, setSelectedDate] = useState(null);

@@ -100,7 +100,6 @@ body.dark-mode .App {
 .calendar-section {
   flex: 1;
   max-width: 500px; /* Increase the size of the calendar container */
-  
   align-items: center; /* Center the calendar horizontally */
   padding-top: 20px; /* Add space at the top */
   border-radius: 8px;
@@ -109,7 +108,7 @@ body.dark-mode .App {
 }
 .react-calendar__month-view__days {
   display: grid;
-  grid-template-columns: repeat(7, 1fr); /* Forces 7 equal columns */
+  grid-template-columns: repeat(8, 1fr); /* Forces 7 equal columns */
 }
 
 .react-calendar__navigation {
