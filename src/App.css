@@ -96,7 +96,6 @@ body.dark-mode .App {
   width: 100%; /* Adjust width as needed */
   max-width: 1200px; /* Set a maximum width */
   padding: 20px;
-  
 }
 .calendar-section {
   flex: 1;
@@ -499,6 +498,77 @@ body.dark-mode .modal-content button:hover {
 body.dark-mode .logo img {
   filter: drop-shadow(0 0 40px rgba(255, 255, 255, 1)); /* Maximum glow effect */
 }
+.password-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-container input {
+  flex: 1;
+}
+
+.eye-icon {
+  color:#280137;
+  position: absolute;
+  right: 20px;
+  cursor: pointer;
+}
+/* File Name: signup.css */
+
+.signup-container .header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.back-arrow {
+  position: absolute;
+  left: 0;
+  cursor: pointer;
+  font-size: 24px;
+  color: #007bff;
+}
+
+.back-arrow:hover {
+  color: #0056b3;
+}
+
+.dark-mode .back-arrow {
+  color: #9014ca;
+}
+
+.dark-mode .back-arrow:hover {
+  color: #a20eb0;
+}
+.role-btn {
+  margin: 5px;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: 2px solid #007bff; /* Border color */
+  color: #007bff; /* Same as border color */
+  background-color: white;
+  cursor: pointer;
+  transition: 0.3s;
+  border-radius: 5px;
+}
+.role-btn:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+.role-btn.selected {
+  background-color: #007bff;
+  color: white;
+}
+.dark-mode .role-btn.selected {
+  background-color: #ff0080;
+  color: white;
+}
+
+
 
 .chore-list-item {
   display: flex;

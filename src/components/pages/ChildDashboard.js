@@ -3,9 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import { getCurrentUser, getUserPoints, getTotalPoints, getUserLevelFromStorage, getChores } from "../utils/localStorageUtils";
 import { useNavigate } from 'react-router-dom';
+import Calendar from 'react-calendar';
 
 function ChildDashboard() {
-    const [chores, setChores] = useState([]);
+    const [selectedDate, setSelectedDate] = useState(null);
+    const [displayAllTasks, setDisplayAllTasks] = useState(true);
+    const [tasksForSelectedDate, setTasksForSelectedDate] = useState([]);
+    const [tasksForNext7Days, setTasksForNext7Days] = useState([]);
     const [points, setPoints] = useState(0);
     const [totalPoints, setTotalPoints] = useState(0);
     const [level, setLevel] = useState({});
@@ -13,13 +17,15 @@ function ChildDashboard() {
     const currentUser = getCurrentUser();
     const navigate = useNavigate();
 
+    const chores = getChores();
+
     useEffect(() => {
         if (currentUser) {
             const userPoints = getUserPoints(currentUser.username);
             const totalEarned = getTotalPoints(currentUser.username);
             setPoints(userPoints);
             setTotalPoints(totalEarned);
-            
+
             const currentLevel = getUserLevelFromStorage(currentUser.username);
             setLevel(currentLevel);
 
@@ -34,16 +40,57 @@ function ChildDashboard() {
 
             const nextLevel = levels.find(l => totalEarned < l.max);
             setNextLevelThreshold(nextLevel ? nextLevel.max : 1000);
-
-            // Get upcoming chores assigned to the current child
-            const storedChores = getChores();
-            const userChores = storedChores
-                .filter(chore => chore.assignedTo === currentUser.username && !chore.completed)
-                .sort((a, b) => new Date(a.date) - new Date(b.date)); // ✅ Sort by date
-
-            setChores(userChores);
         }
     }, [currentUser]);
+
+    useEffect(() => {
+        if (currentUser) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const next7Days = [];
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(today);
+                date.setDate(today.getDate() + i);
+                next7Days.push(date.toISOString().split('T')[0]);
+            }
+
+            const upcomingChores = chores.filter(chore => {
+                if (!chore.date || chore.completed || chore.assignedTo !== currentUser.username) return false;
+
+                const choreDate = new Date(chore.date);
+                choreDate.setHours(0, 0, 0, 0);
+
+                if (isNaN(choreDate.getTime())) return false;
+
+                return next7Days.includes(choreDate.toISOString().split('T')[0]);
+            });
+
+            // ✅ Sort chores by date in ascending order
+            upcomingChores.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            setTasksForNext7Days(upcomingChores);
+        }
+    }, [chores, currentUser]);
+
+    const handleDateSelect = (date) => {
+        setSelectedDate(date);
+        setDisplayAllTasks(false);
+
+        const selectedChores = chores.filter(chore => {
+            if (!chore.date || chore.assignedTo !== currentUser.username) return false;
+
+            const choreDate = new Date(chore.date);
+            choreDate.setHours(0, 0, 0, 0);
+
+            return choreDate.toISOString().split('T')[0] === date.toISOString().split('T')[0];
+        });
+
+        // ✅ Sort selected chores by date in ascending order
+        selectedChores.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        setTasksForSelectedDate(selectedChores);
+    };
 
     return (
         <div className="dashboard child-dashboard">
@@ -61,21 +108,53 @@ function ChildDashboard() {
             <p>Next Level Progress: {totalPoints - (nextLevelThreshold - 200)} / 200</p>
             <progress value={totalPoints - (nextLevelThreshold - 200)} max="200"></progress>
 
-            <div className="content">
-                <h3>Upcoming Chores</h3>
-                {chores.length === 0 ? (
-                    <p>No upcoming chores assigned.</p>
-                ) : (
-                    <ul>
-                        {chores.map(chore => (
-                            <li key={chore.id}>
-                                <span><strong>{chore.text}</strong></span> <br />
-                                <small>Due: {new Date(chore.date).toDateString()}</small> <br />
-                                <span>Points: {chore.points} pts</span>
-                            </li>
-                        ))}
-                    </ul>
-                )}
+            {/* Calendar and Tasks Section - Mirroring Parent Dashboard */}
+            <div className="calendar-tasks-container">
+                <div className="calendar-section">
+                    <Calendar onChange={handleDateSelect} value={selectedDate} />
+                </div>
+
+                <div className="tasks-section">
+                    {displayAllTasks ? (
+                        <>
+                            <h3>Upcoming Chores (Next 7 Days)</h3>
+                            {tasksForNext7Days.length === 0 ? (
+                                <p>No upcoming chores.</p>
+                            ) : (
+                                <ul>
+                                    {tasksForNext7Days.map(task => (
+                                        <li key={task.id}>
+                                            <span style={{ fontWeight: "bold" }}>{task.text}</span>
+                                            <br />
+                                            <small>Due: {new Date(task.date).toDateString()}</small>
+                                            <br />
+                                            <span>Points: {task.points} pts</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </>
+                    ) : (
+                        <>
+                            <h3>Chores for {selectedDate ? selectedDate.toDateString() : ''}</h3>
+                            {tasksForSelectedDate.length === 0 ? (
+                                <p>No chores for this date.</p>
+                            ) : (
+                                <ul>
+                                    {tasksForSelectedDate.map(task => (
+                                        <li key={task.id}>
+                                            {task.text}
+                                            <br />
+                                            <small>Due: {new Date(task.date).toDateString()}</small>
+                                            <br />
+                                            <span>Points: {task.points} pts</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </>
+                    )}
+                </div>
             </div>
         </div>
     );
