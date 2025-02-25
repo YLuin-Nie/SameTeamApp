@@ -66,7 +66,7 @@ function ChildDashboard() {
                 return next7Days.includes(choreDate.toISOString().split('T')[0]);
             });
 
-            // ✅ Sort chores by date in ascending order
+            //  Sort chores by date in ascending order
             upcomingChores.sort((a, b) => new Date(a.date) - new Date(b.date));
 
             setTasksForNext7Days(upcomingChores);
@@ -86,7 +86,7 @@ function ChildDashboard() {
             return choreDate.toISOString().split('T')[0] === date.toISOString().split('T')[0];
         });
 
-        // ✅ Sort selected chores by date in ascending order
+        //  Sort selected chores by date in ascending order
         selectedChores.sort((a, b) => new Date(a.date) - new Date(b.date));
 
         setTasksForSelectedDate(selectedChores);
@@ -104,7 +104,7 @@ function ChildDashboard() {
                 Level {level.level} - {level.name}
             </div>
 
-            {/* ✅ Progress to the next level */}
+            {/*  Progress to the next level */}
             <p>Next Level Progress: {totalPoints - (nextLevelThreshold - 200)} / 200</p>
             <progress value={totalPoints - (nextLevelThreshold - 200)} max="200"></progress>
 
