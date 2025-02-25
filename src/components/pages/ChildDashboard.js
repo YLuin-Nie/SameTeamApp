@@ -95,7 +95,7 @@ function ChildDashboard() {
 
     return (
         <div className="dashboard child-dashboard">
-            <h2>Child Dashboard</h2>
+            <h1>Child Dashboard</h1>
             <p className="welcome-message">Welcome, {currentUser ? currentUser.username : "Child"}!</p>
             <p><strong>Total Points Earned:</strong> {totalPoints}</p>
             <p><strong>Unspent Points:</strong> {points}</p>

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { getUsers, getCurrentUser, getChores, getUserLevelFromStorage } from "../utils/localStorageUtils";
 import Calendar from 'react-calendar';
+import '../Calendar.css'; 
 
 function ParentDashboard() {
     const [selectedDate, setSelectedDate] = useState(null);

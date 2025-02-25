@@ -4,7 +4,7 @@
   left: 0;
   top: 0;
   bottom: 0;
-  background-color: #298cf0;
+  background-image: radial-gradient(circle, #22ceed, #6a5acd);
   padding: 20px;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
 }
@@ -14,7 +14,7 @@
   left: 0;
   top: 0;
   bottom: 0;
-  background-color: #280137;
+  background-image: radial-gradient(circle, #c512e0, #740a9b);
   padding: 20px;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
 }
@@ -106,16 +106,8 @@ body.dark-mode .App {
   grid-column: 1/8;
   
 }
-.react-calendar__month-view__days {
-  display: grid;
-  grid-template-columns: repeat(8, 1fr); /* Forces 7 equal columns */
-}
 
-.react-calendar__navigation {
-  display: flex; /* Use flexbox to align items horizontally */
-  justify-content: space-between; /* Space the buttons evenly */
-  align-items: center; /* Align the buttons vertically centered */
-}
+
 .divider {
   width: 2px;
   background-color: #ccc;
@@ -124,7 +116,7 @@ body.dark-mode .App {
 
 .tasks-section {
   flex: 1; /* Ensure the tasks section takes up equal space */
-  background-color: #0679d7; /* Add background color */
+  background-image: radial-gradient(circle, #22ceed, #6a5acd);
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgb(24, 24, 24);
@@ -133,18 +125,16 @@ body.dark-mode .App {
 }
 .dark-mode .tasks-section {
   flex: 1; /* Ensure the tasks section takes up equal space */
-  background-color: #9014ca; /* Add background color */
+  background-image: radial-gradient(circle, #c512e0, #740a9b);
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgb(16, 16, 16);
+  box-shadow: 0 2px 4px rgb(24, 24, 24);
   margin-top: 20px; /* Add space between calendar and tasks */
   margin-right: 30px; /* Add space to the right */
 }
 /* Calendar Styles */
 .react-calendar {
   width: 100%;
-  background-color: #fbfafb;
-  border: 1px solid #ccc;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding-right: 10px;
@@ -152,8 +142,6 @@ body.dark-mode .App {
 /* Calendar Styles */
 .dark-mode .react-calendar {
   width: 100%;
-  background-color: rebeccapurple;
-  border: 1px solid #ccc;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding-right: 10px;
