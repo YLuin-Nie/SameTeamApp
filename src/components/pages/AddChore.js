@@ -11,6 +11,7 @@ const AddChore = () => {
   const [chores, setChores] = useState([]);
   const [editingChoreId, setEditingChoreId] = useState(null);
   const [editedChoreText, setEditedChoreText] = useState('');
+  const [editedChorePoints, setEditedChorePoints] = useState(10);
   const [editedChoreDate, setEditedChoreDate] = useState('');
   const [editedAssignedTo, setEditedAssignedTo] = useState('');
   const familyMembers = getUsers().filter(user => user.role === "Child");
@@ -19,19 +20,16 @@ const AddChore = () => {
     setChores(getChores());
   }, []);
 
-  // Get today's date and date 7 days ago
   const today = new Date();
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(today.getDate() - 7);
 
-  // Separate chores into pending and completed (last 7 days only)
   const pendingChores = chores.filter(chore => !chore.completed);
   const completedChores = chores.filter(chore => chore.completed && new Date(chore.date) >= sevenDaysAgo);
 
-  // Add a new chore
   const addChore = () => {
     if (newChore.trim() && assignedTo && choreDate) {
-      const localDate = new Date(choreDate + 'T00:00:00'); 
+      const localDate = new Date(choreDate + 'T00:00:00');
       const newChoreObj = {
         id: Date.now(),
         text: newChore,
@@ -50,7 +48,6 @@ const AddChore = () => {
     }
   };
 
-  // Complete/Undo Complete Chore
   const toggleCompletion = (choreId) => {
     const updatedChores = chores.map(chore =>
       chore.id === choreId ? { ...chore, completed: !chore.completed } : chore
@@ -66,25 +63,29 @@ const AddChore = () => {
     }
   };
 
-  // Delete a chore
   const deleteChore = (choreId) => {
     setChores(chores.filter(chore => chore.id !== choreId));
     saveChores(chores.filter(chore => chore.id !== choreId));
   };
 
-  // Start editing a chore
   const startEdit = (chore) => {
     setEditingChoreId(chore.id);
     setEditedChoreText(chore.text);
-    setEditedChoreDate(chore.date.split('T')[0]); // Extract date part
+    setEditedChorePoints(chore.points);
+    setEditedChoreDate(chore.date.split('T')[0]);
     setEditedAssignedTo(chore.assignedTo);
   };
 
-  // Save edited chore (including reassigning task)
   const saveEdit = (choreId) => {
     const updatedChores = chores.map(chore =>
-      chore.id === choreId 
-        ? { ...chore, text: editedChoreText, date: new Date(editedChoreDate + 'T00:00:00').toISOString(), assignedTo: editedAssignedTo } 
+      chore.id === choreId
+        ? {
+            ...chore,
+            text: editedChoreText,
+            points: editedChorePoints,
+            date: new Date(editedChoreDate + 'T00:00:00').toISOString(),
+            assignedTo: editedAssignedTo,
+          }
         : chore
     );
 
@@ -123,7 +124,6 @@ const AddChore = () => {
       </select>
       <button onClick={addChore}>Add Chore</button>
 
-      {/* Pending Chores */}
       <h3>Pending Chores</h3>
       <ul>
         {pendingChores.map(chore => (
@@ -131,6 +131,7 @@ const AddChore = () => {
             {editingChoreId === chore.id ? (
               <>
                 <input type="text" value={editedChoreText} onChange={(e) => setEditedChoreText(e.target.value)} />
+                <input type="number" value={editedChorePoints} onChange={(e) => setEditedChorePoints(Number(e.target.value))} />
                 <input type="date" value={editedChoreDate} onChange={(e) => setEditedChoreDate(e.target.value)} />
                 <select value={editedAssignedTo} onChange={(e) => setEditedAssignedTo(e.target.value)}>
                   {familyMembers.map(member => (
@@ -154,7 +155,6 @@ const AddChore = () => {
         ))}
       </ul>
 
-      {/* Completed Chores (Last 7 Days) */}
       <h3>Completed Chores (Last 7 Days)</h3>
       <ul>
         {completedChores.map(chore => (
