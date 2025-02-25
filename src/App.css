@@ -105,9 +105,15 @@ body.dark-mode .App {
   align-items: center; /* Center the calendar horizontally */
   padding-top: 20px; /* Add space at the top */
   border-radius: 8px;
+  grid-column: 1/8;
   
 }
 
+.react-calendar__navigation {
+  display: flex; /* Use flexbox to align items horizontally */
+  justify-content: space-between; /* Space the buttons evenly */
+  align-items: center; /* Align the buttons vertically centered */
+}
 .divider {
   width: 2px;
   background-color: #ccc;
@@ -149,24 +155,6 @@ body.dark-mode .App {
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding-right: 10px;
-}
-
-
-.react-calendar__tile {
-  max-width: 100%;
-  text-align: center;
-  padding: 10px;
-  border-radius: 4px;
-  background-color: blue;
-  transition: background-color 0.2s;
-}
-
-.react-calendar__tile--active {
-  background-color:blue;
-}
-
-.react-calendar__tile--active:hover {
-  background-color: #0056b3;
 }
 
 
