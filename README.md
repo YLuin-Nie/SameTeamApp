@@ -1,74 +1,39 @@
-# Same Team Family Project Management App
+## Family Chore & Rewards App
 
+A lightweight React application for managing family chores, rewarding kids, and tracking progress—all stored locally in the browser. The app offers different experiences for Parents and Children, making it easy for families to stay organized and motivated.
 
+## Overview
 
-# Getting Started with Create React App
+This app is designed to help families manage household tasks and reward children for completing their chores. It leverages localStorage to persist user data, chores, and rewards. Users can sign up, log in, and set up their profiles as either a Parent or a Child. Parents can assign chores, manage rewards, and track the progress of their children, while children can view their assigned chores, see their earned points, and redeem rewards.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Features
 
-## Available Scripts
+- **Authentication & Profile Setup**
+  - **Sign Up / Sign In:** Create and log in to an account with secure password hashing using bcrypt.
+  - **Profile Setup:** Choose a role (Parent or Child) and, for parents, set a team name.
 
-In the project directory, you can run:
+- **Chore Management**
+  - **Add Chore:** Parents can add new chores with details such as description, points, due date, and assignment to a child.
+  - **Chore List:** Children can view their pending chores, mark them as completed, and see a progress bar reflecting task completion.
+  - **Calendar Integration:** A calendar view to display chores scheduled for a particular date.
 
-### `npm start`
+- **Rewards System**
+  - **Parent Rewards:** Parents can reward children by assigning extra points and defining new rewards.
+  - **Child Rewards:** Children can redeem rewards using their unspent points and review their redemption history.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **Progress & Leveling**
+  - **Points & Levels:** Earn points for completed chores and progress through levels (e.g., Beginner, Apprentice, Challenger, etc.), with visual badges indicating current level and progress toward the next milestone.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- **Theming**
+  - **Dark Mode:** Toggle between light and dark themes, with the setting saved in localStorage for a consistent user experience.
 
-### `npm test`
+- **Local Storage Utilities**
+  - Comprehensive helper functions manage users, chores, and rewards, ensuring data is persisted across sessions without the need for a backend.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Technologies
 
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- **React.js:** Functional components with Hooks
+- **React Router:** Client-side routing for a multi-page feel
+- **bcryptjs:** For secure password hashing
+- **react-calendar:** Calendar integration for date-based chore viewing
+- **LocalStorage:** Client-side persistence for user data, chores, and rewards

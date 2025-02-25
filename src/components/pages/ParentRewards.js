@@ -6,8 +6,15 @@ import { getUsers, saveUsers, getRedeemedRewards, storeRedeemedReward, addReward
 function ParentRewards() {
     const [children, setChildren] = useState([]);
     const [selectedChild, setSelectedChild] = useState("");
-    const [rewardName, setRewardName] = useState("");
-    const [rewardPoints, setRewardPoints] = useState(10);
+    
+    // Separate state for rewarding a child
+    const [rewardChildName, setRewardChildName] = useState("");
+    const [rewardChildPoints, setRewardChildPoints] = useState(10);
+    
+    // Separate state for defining new rewards
+    const [newRewardName, setNewRewardName] = useState("");
+    const [newRewardPoints, setNewRewardPoints] = useState(10);
+    
     const [redeemedRewards, setRedeemedRewards] = useState([]);
     const [rewards, setRewards] = useState([]);
     const [editingReward, setEditingReward] = useState(null);
@@ -25,7 +32,7 @@ function ParentRewards() {
     }, []);
 
     const rewardChild = () => {
-        if (!selectedChild || !rewardName || rewardPoints <= 0) {
+        if (!selectedChild || !rewardChildName || rewardChildPoints <= 0) {
             alert("Please select a child, enter a reward, and set a valid point amount.");
             return;
         }
@@ -33,7 +40,7 @@ function ParentRewards() {
         const users = getUsers();
         const updatedUsers = users.map(user => {
             if (user.username === selectedChild) {
-                const newPoints = (user.points || 0) + rewardPoints;
+                const newPoints = (user.points || 0) + rewardChildPoints;
                 return { ...user, points: newPoints };
             }
             return user;
@@ -42,29 +49,29 @@ function ParentRewards() {
         saveUsers(updatedUsers);
 
         // ✅ Store reward as a completed chore
-        addRewardAsCompletedChore(selectedChild, rewardName, rewardPoints);
+        addRewardAsCompletedChore(selectedChild, rewardChildName, rewardChildPoints);
 
-        alert(`Successfully rewarded ${rewardPoints} points to ${selectedChild} for ${rewardName}!`);
+        alert(`Successfully rewarded ${rewardChildPoints} points to ${selectedChild} for ${rewardChildName}!`);
         
         setSelectedChild("");
-        setRewardName("");
-        setRewardPoints(10);
+        setRewardChildName("");
+        setRewardChildPoints(10);
     };
 
     const addReward = () => {
-        if (!rewardName.trim() || rewardPoints <= 0) {
+        if (!newRewardName.trim() || newRewardPoints <= 0) {
             alert("Please enter a valid reward name and cost.");
             return;
         }
 
-        const newReward = { id: Date.now(), name: rewardName, cost: rewardPoints };
+        const newReward = { id: Date.now(), name: newRewardName, cost: newRewardPoints };
         const updatedRewards = [...rewards, newReward];
 
         setRewards(updatedRewards);
         saveRewards(updatedRewards); // ✅ Store rewards in localStorage
 
-        setRewardName("");
-        setRewardPoints(10);
+        setNewRewardName("");
+        setNewRewardPoints(10);
     };
 
     const deleteReward = (id) => {
@@ -103,18 +110,18 @@ function ParentRewards() {
             </select>
 
             <label>Reward Name:</label>
-            <input type="text" value={rewardName} onChange={(e) => setRewardName(e.target.value)} placeholder="Enter reward (e.g., Extra Playtime)" />
+            <input type="text" value={rewardChildName} onChange={(e) => setRewardChildName(e.target.value)} placeholder="Enter reward (e.g., Extra Playtime)" />
 
             <label>Points:</label>
-            <input type="number" value={rewardPoints} onChange={(e) => setRewardPoints(Number(e.target.value))} min="1" />
+            <input type="number" value={rewardChildPoints} onChange={(e) => setRewardChildPoints(Number(e.target.value))} min="1" />
 
             <button onClick={rewardChild}>Reward Points</button>
 
             <hr />
 
             <h3>Define New Rewards</h3>
-            <input type="text" placeholder="Reward Name" value={rewardName} onChange={(e) => setRewardName(e.target.value)} />
-            <input type="number" placeholder="Cost" value={rewardPoints} onChange={(e) => setRewardPoints(Number(e.target.value))} />
+            <input type="text" placeholder="Reward Name" value={newRewardName} onChange={(e) => setNewRewardName(e.target.value)} />
+            <input type="number" placeholder="Cost" value={newRewardPoints} onChange={(e) => setNewRewardPoints(Number(e.target.value))} />
             <button onClick={addReward}>Add Reward</button>
 
             <hr />
@@ -164,4 +171,3 @@ function ParentRewards() {
 }
 
 export default ParentRewards;
-
