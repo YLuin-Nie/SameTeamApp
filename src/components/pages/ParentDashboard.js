@@ -72,7 +72,7 @@ function ParentDashboard() {
 
     return (
         <div className="dashboard parent-dashboard">
-            <h2>Parent Dashboard</h2>
+            <h1>Parent Dashboard</h1>
             <p>Welcome, {currentUser ? currentUser.username : "Parent"}! Manage your family's progress here.</p>
 
             <h3>Children's Levels</h3>
