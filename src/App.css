@@ -4,7 +4,7 @@
   left: 0;
   top: 0;
   bottom: 0;
-  background-color: #298cf0;
+  background-image: radial-gradient(circle, #22ceed, #6a5acd);
   padding: 20px;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
 }
@@ -14,7 +14,7 @@
   left: 0;
   top: 0;
   bottom: 0;
-  background-color: #280137;
+  background-image: radial-gradient(circle, #c512e0, #740a9b);
   padding: 20px;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
 }
@@ -96,18 +96,17 @@ body.dark-mode .App {
   width: 100%; /* Adjust width as needed */
   max-width: 1200px; /* Set a maximum width */
   padding: 20px;
-  
 }
 .calendar-section {
   flex: 1;
   max-width: 500px; /* Increase the size of the calendar container */
-  display: flex;
-  flex-direction: column;
   align-items: center; /* Center the calendar horizontally */
   padding-top: 20px; /* Add space at the top */
   border-radius: 8px;
+  grid-column: 1/8;
   
 }
+
 
 .divider {
   width: 2px;
@@ -117,7 +116,7 @@ body.dark-mode .App {
 
 .tasks-section {
   flex: 1; /* Ensure the tasks section takes up equal space */
-  background-color: #0679d7; /* Add background color */
+  background-image: radial-gradient(circle, #22ceed, #6a5acd);
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgb(24, 24, 24);
@@ -126,18 +125,16 @@ body.dark-mode .App {
 }
 .dark-mode .tasks-section {
   flex: 1; /* Ensure the tasks section takes up equal space */
-  background-color: #9014ca; /* Add background color */
+  background-image: radial-gradient(circle, #c512e0, #740a9b);
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgb(16, 16, 16);
+  box-shadow: 0 2px 4px rgb(24, 24, 24);
   margin-top: 20px; /* Add space between calendar and tasks */
   margin-right: 30px; /* Add space to the right */
 }
 /* Calendar Styles */
 .react-calendar {
   width: 100%;
-  background-color: #fbfafb;
-  border: 1px solid #ccc;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding-right: 10px;
@@ -145,29 +142,9 @@ body.dark-mode .App {
 /* Calendar Styles */
 .dark-mode .react-calendar {
   width: 100%;
-  background-color: rebeccapurple;
-  border: 1px solid #ccc;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding-right: 10px;
-}
-
-
-.react-calendar__tile {
-  max-width: 100%;
-  text-align: center;
-  padding: 10px;
-  border-radius: 4px;
-  background-color: blue;
-  transition: background-color 0.2s;
-}
-
-.react-calendar__tile--active {
-  background-color:blue;
-}
-
-.react-calendar__tile--active:hover {
-  background-color: #0056b3;
 }
 
 
@@ -499,6 +476,77 @@ body.dark-mode .modal-content button:hover {
 body.dark-mode .logo img {
   filter: drop-shadow(0 0 40px rgba(255, 255, 255, 1)); /* Maximum glow effect */
 }
+.password-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-container input {
+  flex: 1;
+}
+
+.eye-icon {
+  color:#280137;
+  position: absolute;
+  right: 20px;
+  cursor: pointer;
+}
+/* File Name: signup.css */
+
+.signup-container .header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.back-arrow {
+  position: absolute;
+  left: 0;
+  cursor: pointer;
+  font-size: 24px;
+  color: #007bff;
+}
+
+.back-arrow:hover {
+  color: #0056b3;
+}
+
+.dark-mode .back-arrow {
+  color: #9014ca;
+}
+
+.dark-mode .back-arrow:hover {
+  color: #a20eb0;
+}
+.role-btn {
+  margin: 5px;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: 2px solid #007bff; /* Border color */
+  color: #007bff; /* Same as border color */
+  background-color: white;
+  cursor: pointer;
+  transition: 0.3s;
+  border-radius: 5px;
+}
+.role-btn:hover {
+  background-color: #007bff;
+  color: white;
+}
+
+.role-btn.selected {
+  background-color: #007bff;
+  color: white;
+}
+.dark-mode .role-btn.selected {
+  background-color: #ff0080;
+  color: white;
+}
+
+
 
 .chore-list-item {
   display: flex;

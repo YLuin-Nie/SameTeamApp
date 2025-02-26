@@ -1,5 +1,3 @@
-// File Name: ProfileSetup.js
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getCurrentUser } from "../utils/localStorageUtils";
