@@ -1,5 +1,9 @@
 // File Name: App.js
 
+// SDC445 Class Project - SameTeamApp
+// Team 6:  Andrew Fisher, Bob Nie, Bansari Patel
+// Date: 2025-02-27
+
 import './App.css';
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
@@ -89,7 +93,7 @@ function App() {
 
         return (
             <div className="flex">
-                {/* ✅ Show NavBar on all routes EXCEPT those in `hideNavBarRoutes` */}
+                {/* Show NavBar on all routes EXCEPT those in `hideNavBarRoutes` */}
                 {!hideNavBarRoutes.includes(location.pathname) && <NavBar currentUser={currentUser} setCurrentUser={setCurrentUser} />}
                 
                 <div className={`flex-1 ${hideNavBarRoutes.includes(location.pathname) ? "w-full" : "ml-64"}`}>
