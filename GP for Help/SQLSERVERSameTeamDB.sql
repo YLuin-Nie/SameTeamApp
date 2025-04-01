@@ -1,4 +1,4 @@
--- Create Database Only If It Doesn't Exist
+-- Create Database Only If It Doesn't Exist  sss
 IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = 'SameTeamDB')
 BEGIN
     CREATE DATABASE SameTeamDB;
